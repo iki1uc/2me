@@ -1,23 +1,40 @@
-# iki1uc – ROOT
+# 2me – Mirror-Root (iki1uc)
 
-## Zweck
-Dieses Repository bildet den Ursprung der gesamten Struktur.  
-Es stellt die öffentliche Identität des Systems bereit und dient  
-als Einstiegspunkt für alle Module, Achsen und Bereiche.
+2me ist die Rückkehr-Einheit des iki1uc-Systems.
+Sie spiegelt alle Systemachsen zurück auf den User:
 
-## Identität
-- CORE: iki1uc  
-- VERSION: 1.0  
-- CODE: RAW  
-- LAGE: ROOT / Creator / NC  
-- STATUS: Online  
+- PX3 / PX6 / PX9 (PX-TRIO)
+- PX12 / PX4 (Fusion + Achse)
+- SYS / SYS-x (System + Kreuzung)
+- TEM (Zeit)
+- UI-SCANNER (Interface)
+- GEO (O12 / Φ4 / XU / TΩ)
 
-## Inhalt
-- index.html – öffentliche Landing‑Page  
-- ID.html – Identitätsdarstellung  
-- visual/ – Visualisierungen  
-- modules/ – Verlinkte System‑Repos  
+2me erzeugt:
+- Mirror-Return
+- User-Bindung
+- Orbit-Rückführung
+- Root-Synchronisation
 
-## Hinweis
-Dieses Repository enthält keine Engine‑Mechanismen.  
-Es dient ausschließlich der öffentlichen Darstellung und Struktur.
+-----------------------------------------
+# FUNKTION
+
+2me(x):
+    return `2me(${x})`
+
+-----------------------------------------
+# SYSTEM-CYCLE
+
+SYS-x → 2me → PX3
+
+-----------------------------------------
+# MODULE
+
+ID.html     – Identität  
+index.html  – Mirror-Interface  
+2me.js      – Mirror-Funktion  
+
+-----------------------------------------
+# STATUS
+
+2me ist aktiv, eigenständig und vollständig iki1uc.
