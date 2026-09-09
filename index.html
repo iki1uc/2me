@@ -1,547 +1,1446 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>⚙️ ADMIN‑PULT · ULMR · 3‑9‑81 ACHSEN</title>
-
-  <!-- ===== DEIN EXISTIERENDES CSS ===== -->
-  <link rel="stylesheet" href="style.css" />
-
-  <!-- ===== ZUSÄTZLICHES ADMIN‑CSS ===== -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IKI1UC · 3 Axiome · Ursache · Wirkung · Kreislauf</title>
   <style>
-    :root {
-      --bg: #0a0a12;
-      --fg: #0ff;
-      --gold: #ffd700;
-      --vital: #00ff88;
-      --co2: #ff6600;
-      --wasser: #66ccff;
-      --sauerstoff: #00ff88;
-      --anime: #ff66ff;
-      --shuffle: #ffaa00;
-      --orbit: #6b6bff;
-      --suite: #ff66ff;
-      --commander: #ff8c00;
-      --admin0: #ff0044;
-      --magneto: #ff00ff;
-      --krümmung: #00ffff;
-      --bootlink: #6ec8ff;
-      --achse1: #ffaa44;
-      --achse2: #44ffaa;
-      --achse3: #aa44ff;
-    }
     * { margin:0; padding:0; box-sizing:border-box; }
     body {
-      background: var(--bg);
-      color: var(--fg);
+      background: #0a0a12;
+      color: #d0d9e6;
       font-family: 'Consolas', monospace;
-      padding: 12px;
-      background-image: radial-gradient(ellipse at 20% 30%, #0c0c1a 0%, #000 100%);
-    }
-    .admin-header {
+      padding: 10px;
+      min-height: 100vh;
+      background: radial-gradient(ellipse at 30% 40%, #0a0a20, #000);
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
-      flex-wrap: wrap;
-      border-bottom: 2px solid var(--gold);
-      padding-bottom: 10px;
-      margin-bottom: 16px;
     }
-    .admin-header h1 {
-      font-size: 22px;
-      letter-spacing: 4px;
-    }
-    .admin-header h1 .ulmr { color: var(--gold); }
-    .admin-header h1 .achse { color: var(--achse1); }
-    .admin-header .status-led {
-      display: flex;
-      gap: 16px;
-      font-size: 11px;
-    }
-    .admin-header .status-led .dot {
-      display: inline-block;
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      margin-right: 4px;
-    }
-    .dot.green { background: #4f4; box-shadow: 0 0 8px #4f4; }
-    .dot.yellow { background: #ffa; box-shadow: 0 0 8px #ffa; }
-    .dot.red { background: #f44; box-shadow: 0 0 8px #f44; }
-
-    .achsen-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-    @media (max-width: 1000px) { .achsen-grid { grid-template-columns: 1fr 1fr; } }
-    @media (max-width: 700px) { .achsen-grid { grid-template-columns: 1fr; } }
-
-    .achse-panel {
-      background: rgba(10,10,20,0.75);
-      border: 1px solid #1a1a2a;
-      border-radius: 12px;
-      padding: 12px;
-      backdrop-filter: blur(6px);
-    }
-    .achse-panel h2 {
-      color: var(--gold);
-      font-size: 13px;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-      padding-bottom: 6px;
-      margin-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-    }
-    .achse-panel h2 .badge {
-      font-size: 9px;
-      background: #1a1a2a;
-      padding: 2px 8px;
+    .container {
+      max-width: 1500px; width: 100%;
+      background: rgba(10,10,20,0.6);
+      border: 1px solid rgba(255,255,255,0.03);
       border-radius: 20px;
-      color: #888;
+      padding: 20px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 0 80px rgba(0,0,0,0.6);
     }
-    .achse-metrics {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4px;
+    h1 {
+      text-align: center;
+      letter-spacing: 3px;
+      font-weight: 300;
+      font-size: 22px;
+      background: linear-gradient(90deg, #ffd700, #00ccff, #ff66ff, #00ff88);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 4px;
     }
-    .metric-item {
-      background: #0e0e1a;
-      border-radius: 4px;
-      padding: 4px 8px;
-      display: flex;
-      justify-content: space-between;
-      font-size: 11px;
-    }
-    .metric-item .label { color: #666; }
-    .metric-item .value { font-weight: bold; }
-    .value.achse1 { color: var(--achse1); }
-    .value.achse2 { color: var(--achse2); }
-    .value.achse3 { color: var(--achse3); }
-
-    .deutung-panel {
-      background: rgba(10,10,20,0.7);
-      border: 1px solid #1a1a2a;
-      border-radius: 12px;
-      padding: 12px;
-      margin-bottom: 16px;
-    }
-    .deutung-panel h2 {
-      color: var(--gold);
-      font-size: 13px;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-      padding-bottom: 6px;
-      margin-bottom: 8px;
-    }
-    #deutung-output {
-      background: #06060a;
-      border-radius: 6px;
-      padding: 8px;
+    h1 small {
       font-size: 10px;
-      max-height: 120px;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      color: #88ddbb;
-      border: 1px solid #1a1a2a;
-      line-height: 1.5;
+      display: block;
+      color: #3d5a70;
+      -webkit-text-fill-color: #3d5a70;
+      letter-spacing: 2px;
     }
+    .grid3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+    }
+    @media(max-width:1100px){ .grid3 { grid-template-columns:1fr 1fr; } }
+    @media(max-width:700px){ .grid3 { grid-template-columns:1fr; } }
 
-    .controls-zone {
+    .panel {
+      background: rgba(255,255,255,0.03);
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      border: 1px solid rgba(0,200,255,0.08);
+    }
+    .panel h3 {
+      font-size: 10px;
+      color: #3d5a70;
+      letter-spacing: 2px;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+    }
+    .flex { display:flex; flex-wrap:wrap; gap:4px; align-items:center; margin:3px 0; }
+
+    button {
+      background: #0f0;
+      color: #000;
+      font-weight: bold;
+      border: none;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    button:hover { background: #0ff; }
+    button.sec { background:transparent; color:#0f0; border:1px solid #0f0; }
+    button.sec:hover { background:#0f0; color:#000; }
+    button.gold { background:#ffd700; color:#000; }
+    button.gold:hover { background:#ffaa00; }
+    button.ice { color:#4fc3f7; border:1px solid rgba(79,195,247,0.2); background:transparent; }
+    button.ice:hover { background:rgba(79,195,247,0.1); }
+    button.water { color:#4dd0e1; border:1px solid rgba(77,208,225,0.2); background:transparent; }
+    button.water:hover { background:rgba(77,208,225,0.1); }
+    button.fire { color:#ff7043; border:1px solid rgba(255,112,67,0.2); background:transparent; }
+    button.fire:hover { background:rgba(255,112,67,0.1); }
+    button.matrix { background: #ff88ff; color:#000; border:1px solid #ff88ff; }
+    button.matrix:hover { background:#ff66ff; }
+
+    .axle-grid {
+      display: grid;
+      grid-template-columns: repeat(9, 1fr);
+      gap: 2px;
+      margin: 3px 0;
+    }
+    .axle-cell {
+      background: #0a0a0a;
+      padding: 3px;
+      text-align: center;
+      font-size: 7px;
+      border: 1px solid #111;
+      border-radius: 2px;
+      color: #3d5a70;
+      cursor: pointer;
+    }
+    .axle-cell.on { background:#0a2a1a; color:#6bffa9; border-color:#0f0; }
+    .axle-cell.off { background:#0a0a0a; color:#3d5a70; }
+
+    .status-row {
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
-      background: rgba(10,10,20,0.5);
-      border-radius: 10px;
-      padding: 10px;
-      margin-bottom: 12px;
+      font-size: 9px;
+      margin: 3px 0;
+      color: #5a7a8a;
+    }
+    .status-row span {
+      background: rgba(255,255,255,0.02);
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+    .green { color:#6bffa9; }
+    .gold  { color:#ffd700; }
+    .cyan  { color:#66ccff; }
+    .pink  { color:#ff88ff; }
+
+    .console {
+      background: #0a0a0a;
+      padding: 6px;
+      border-radius: 4px;
+      font-size: 7px;
+      color: #3d5a70;
+      max-height: 80px;
+      overflow-y: auto;
+      border: 1px solid #111;
+    }
+    .console .log-ok { color:#6bffa9; }
+    .console .log-warn { color:#ffd700; }
+    .console .log-info { color:#66ccff; }
+    .console .log-err { color:#ff6b8a; }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 4px;
+      margin: 4px 0;
+    }
+    .metric {
+      background: #0a0a0a;
+      padding: 6px;
+      border-radius: 4px;
+      text-align: center;
       border: 1px solid #1a1a2a;
     }
-    .controls-zone button {
-      background: #111;
-      color: var(--fg);
-      border: 1px solid #333;
-      padding: 4px 14px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-family: inherit;
-      font-size: 9px;
-      transition: 0.2s;
+    .metric .label { font-size:7px; color:#3d5a70; text-transform:uppercase; }
+    .metric .value { font-size:16px; font-weight:bold; color:#6bffa9; }
+    .metric .value.gold { color:#ffd700; }
+    .metric .value.info { color:#66ccff; }
+
+    .board-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 320px;
+      margin: 0 auto;
+      aspect-ratio: 1/1;
+      background: rgba(0,0,0,0.2);
+      border-radius: 10px;
+      border: 1px solid rgba(255,215,0,0.05);
+      overflow: hidden;
     }
-    .controls-zone button:hover { border-color: var(--gold); background: #1a1a2a; }
-    .controls-zone button.primary { border-color: var(--gold); color: var(--gold); }
-    .controls-zone button.primary:hover { background: var(--gold); color: #000; }
-    .controls-zone button.attack { border-color: var(--commander); color: var(--commander); }
-    .controls-zone button.attack:hover { background: var(--commander); color: #000; }
-    .controls-zone button.mesh { border-color: var(--vital); color: var(--vital); }
-    .controls-zone button.mesh:hover { background: var(--vital); color: #000; }
-    .controls-zone input {
-      background: #1e242c;
-      border: 1px solid #2f3542;
-      color: #fff;
+    #atmoCanvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+    #chessCanvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 1;
+    }
+    .badge {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 8px;
+      margin: 0 2px;
+    }
+    .badge.info { background:#0a1a2a; color:#66ccff; }
+
+    .matrix-visual {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 6px 0;
+      font-size: 12px;
+      color: #66ccff;
+      line-height: 1.8;
+    }
+    .matrix-visual .row {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      border: none;
+      padding: 2px 0;
+    }
+    .matrix-visual .node {
+      background: #0a0a0a;
       padding: 4px 10px;
-      border-radius: 4px;
-      font-family: inherit;
-      font-size: 9px;
-      flex: 1;
-      min-width: 140px;
-    }
-
-    .boot-block-monitor {
-      background: rgba(10,10,20,0.7);
-      border: 1px solid #1a1a2a;
-      border-radius: 10px;
-      padding: 10px;
-      margin-top: 8px;
-    }
-    .boot-block-monitor .row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      font-size: 10px;
-    }
-    .boot-block-monitor .row .item {
-      color: #666;
-    }
-    .boot-block-monitor .row .item span {
-      color: var(--bootlink);
-      font-weight: bold;
-    }
-
-    .footer-admin {
-      margin-top: 16px;
-      padding: 8px 12px;
-      background: rgba(0,0,0,0.3);
       border-radius: 6px;
-      font-size: 9px;
-      color: #445555;
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
+      border: 1px solid #3d5a70;
+      color: #ffd700;
+      font-weight: bold;
+      min-width: 40px;
+      text-align: center;
     }
-    .footer-admin .gold { color: var(--gold); }
+    .matrix-visual .arrow { color: #0ff; font-size: 16px; }
+
+    .football-input {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin: 4px 0;
+      font-size: 9px;
+    }
+    .football-input label { color: #5a7a8a; width: 60px; }
+    .football-input input {
+      background: #0a0a0a;
+      border: 1px solid #1a1a2a;
+      color: #0f0;
+      padding: 2px 4px;
+      width: 50px;
+      font-family: monospace;
+      font-size: 9px;
+      border-radius: 3px;
+    }
+    .football-input .result { color: #ffd700; font-weight: bold; margin-left: 8px; }
+
+    .clock-display {
+      display: flex;
+      justify-content: space-around;
+      font-size: 9px;
+      background: #0a0a0a;
+      padding: 4px;
+      border-radius: 4px;
+      border: 1px solid #1a1a2a;
+      margin: 4px 0;
+    }
+    .clock-display .time-type { color: #5a7a8a; }
+    .clock-display .time-value { color: #ffd700; font-weight: bold; }
+
+    .energy-bar {
+      background: #0a0a0a;
+      border-radius: 4px;
+      height: 14px;
+      width: 100%;
+      border: 1px solid #1a1a2a;
+      overflow: hidden;
+    }
+    .energy-bar .fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ff00cc, #3333ff);
+      transition: width 0.3s;
+      font-size: 6px;
+      text-align: center;
+      line-height: 14px;
+      color: #fff;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 14px;
+      color: #1a1a1a;
+      font-size: 8px;
+      letter-spacing: 2px;
+      border-top: 1px solid rgba(255,255,255,0.01);
+      padding-top: 10px;
+    }
+    .footer span { color: #ffd700; opacity:0.3; }
+    .footer a { color: #66ccff; text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+
+    @keyframes floatUp {
+      0% { opacity:0.8; transform:translateY(0) scale(1); }
+      100% { opacity:0; transform:translateY(-80px) scale(0.5); }
+    }
   </style>
 </head>
 <body>
+<div class="container">
 
-<!-- ===== HEADER ===== -->
-<div class="admin-header">
-  <h1>
-    <span class="ulmr">⚙️ ULMR</span>
-    <span style="color:#666;">·</span>
-    <span class="achse">3‑9‑81 ACHSEN</span>
-    <span style="color:#666;">·</span>
-    <span style="color:var(--gold);">ADMIN‑PULT</span>
+  <h1>🧠 IKI1UC · 3 Axiome · Ursache · Wirkung · Kreislauf</h1>
+  <h1 style="font-size:11px;margin-top:-2px;background:none;-webkit-text-fill-color:#3d5a70;color:#3d5a70;font-weight:400">
+    81‑SLOT · GEO‑MATRIX · FUSION · 3hit90 · 90‑TAGE‑KOMPRESSION
   </h1>
-  <div class="status-led">
-    <span><span class="dot green"></span> 3.js</span>
-    <span><span class="dot green"></span> 9.js</span>
-    <span><span class="dot green"></span> 81.js</span>
-    <span id="sys-clock" style="color:#666;">⏱️ --:--</span>
-  </div>
-</div>
 
-<!-- ===== DREI ACHSEN (ENGINES) ===== -->
-<div class="achsen-grid">
-  <div class="achse-panel" id="achse-welt">
-    <h2>🌍 WELT‑ACHSE <span class="badge">3.js</span></h2>
-    <div class="achse-metrics">
-      <div class="metric-item"><span class="label">Router</span><span class="value achse1" id="welt-router">—</span></div>
-      <div class="metric-item"><span class="label">Stage</span><span class="value achse1" id="welt-stage">—</span></div>
-      <div class="metric-item"><span class="label">Plugins</span><span class="value achse1" id="welt-plugins">—</span></div>
-      <div class="metric-item"><span class="label">UI‑Badges</span><span class="value achse1" id="welt-badges">—</span></div>
+  <div class="grid3">
+
+    <!-- LINKES PANEL: URACHE (Input) -->
+    <div>
+      <div class="panel">
+        <h3>⚡ AXIOM 1 · URACHE (Input)</h3>
+        <div class="flex">
+          <button class="gold" id="btnGeneral">⚡ GENERAL RUN</button>
+          <button id="btnReset">⟲ RESET</button>
+          <button class="sec" id="btnToggleAll">🔄 ALL TOGGLE</button>
+          <button id="btnRandom">🎲 RANDOM</button>
+          <button id="btnPump">💨 PUMP</button>
+          <button id="btnLoop">♾ LOOP ALL</button>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>🌀 9 ACHSEN · d e i n o r s u w</h3>
+        <div class="axle-grid" id="axleGrid"></div>
+      </div>
+      <div class="panel">
+        <h3>🔷 PUMP · STATIONEN</h3>
+        <div class="flex" style="font-size:8px;color:#5a7a8a;gap:2px">
+          <span class="badge info">HY</span><span class="badge info">PE</span>
+          <span class="badge info">PER</span><span class="badge info">DA</span>
+          <span class="badge info">NE</span><span class="badge info">BEN</span>
+          <span class="badge info">TRANS</span><span class="badge info">WARB</span>
+          <span class="badge info">KANAL</span>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>📊 STATUS</h3>
+        <div class="status-row">
+          <span>SCORE: <span id="scoreVal" style="color:#ffd700">0</span></span>
+          <span>PUMP: <span id="pumpVal" style="color:#6bffa9">0</span></span>
+          <span>QUOTE: <span id="quoteVal" style="color:#66ccff">0%</span></span>
+          <span>PREDICT: <span id="predictVal" style="color:#ffd700">IDLE</span></span>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>🧠 CPU PREDICTIVE · SPRUNG</h3>
+        <div class="flex" style="font-size:8px;gap:6px">
+          <span>STATUS: <span id="cpuStatus" style="color:#6bffa9">ACTIVE</span></span>
+          <span>BIAS: <span id="cpuBias" style="color:#ffd700">FORWARD</span></span>
+          <span>SPRUNG: <span id="cpuJump" style="color:#ff6b8a">0</span></span>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>📜 CONSOLE · LOG</h3>
+        <div class="console" id="consoleLog">⏳ system initialisiert...</div>
+      </div>
     </div>
-  </div>
 
-  <div class="achse-panel" id="achse-kraft">
-    <h2>⚡ KRAFT‑ACHSE <span class="badge">9.js</span></h2>
-    <div class="achse-metrics">
-      <div class="metric-item"><span class="label">Attack‑Queue</span><span class="value achse2" id="kraft-queue">—</span></div>
-      <div class="metric-item"><span class="label">ZEN‑Parser</span><span class="value achse2" id="kraft-zen">—</span></div>
-      <div class="metric-item"><span class="label">Input‑Dispatcher</span><span class="value achse2" id="kraft-input">—</span></div>
-      <div class="metric-item"><span class="label">Befehle</span><span class="value achse2" id="kraft-cmds">0</span></div>
+    <!-- MITTLERES PANEL: WIRKUNG (Output) -->
+    <div>
+      <div class="panel">
+        <h3>♟️ WIRKUNG · Orbit · Schach · Atmo</h3>
+        <div class="board-wrap" id="boardWrap">
+          <canvas id="atmoCanvas"></canvas>
+          <canvas id="chessCanvas"></canvas>
+        </div>
+        <div class="flex" style="margin-top:6px; justify-content:center;">
+          <button class="ice" id="btnIce">❄️ Ice</button>
+          <button class="water" id="btnWater">💧 Water</button>
+          <button class="fire" id="btnFire">🔥 Fire</button>
+          <button id="btnStep">⏭ Zug</button>
+          <button id="btnAuto">▶ Auto</button>
+          <button id="btnResetBoard">⟲ Reset Board</button>
+          <button class="matrix" id="btnRun3">▶ RUN3</button>
+        </div>
+        <div class="status-row">
+          <div class="turn">Zug: <span id="turnIndicator">Weiß</span></div>
+          <div>Zug <span id="moveCount">0</span>/<span id="totalMoves">∞</span></div>
+          <div>🌀 <span id="manaIndicator">0</span></div>
+          <div style="color:#445555;">⚡ <span id="agentStatus">bereit</span></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>📊 PREFETCH · PREDICT · CACHE</h3>
+        <div class="metric-grid">
+          <div class="metric"><div class="label">📦 PREFETCH</div><div class="value" id="prefetchCount">0</div></div>
+          <div class="metric"><div class="label">🧠 PREDICT</div><div class="value gold" id="predictCount">0</div></div>
+          <div class="metric"><div class="label">💾 CACHE</div><div class="value info" id="cacheCount">0</div></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>⚽ SAISON · CLOCK</h3>
+        <div class="flex" style="justify-content:space-between;">
+          <span>Spieltag: <span id="spieltag" class="gold">1</span></span>
+          <span>Tore: <span id="tore" class="gold">0</span></span>
+          <span>Punkte: <span id="punkte" class="gold">0</span></span>
+        </div>
+        <div class="flex">
+          <button id="btnNextSpieltag" class="gold">⚽ Nächster</button>
+          <button id="btnTor" class="cyan">⚡ Tor!</button>
+          <button id="btnPunkt" class="sec">🏆 Punkt</button>
+          <button id="btnResetSaison" class="sec">⟲ Reset</button>
+        </div>
+        <div class="clock-display">
+          <span class="time-type">Engine‑Ticks:</span>
+          <span class="time-value" id="engineTicks">0</span>
+        </div>
+        <div class="clock-display">
+          <span class="time-type">⏱️ 1 Tick = 1 Tag</span>
+          <span class="time-value" id="compressionDisplay">90 Tage = 3 Monate</span>
+        </div>
+      </div>
     </div>
-  </div>
 
-  <div class="achse-panel" id="achse-leben">
-    <h2>🧬 LEBENS‑ACHSE <span class="badge">81.js</span></h2>
-    <div class="achse-metrics">
-      <div class="metric-item"><span class="label">Mesh‑Zellen</span><span class="value achse3" id="leben-zellen">81</span></div>
-      <div class="metric-item"><span class="label">Tick</span><span class="value achse3" id="leben-tick">0</span></div>
-      <div class="metric-item"><span class="label">Vital</span><span class="value achse3" id="leben-vital">0.00</span></div>
-      <div class="metric-item"><span class="label">Drift</span><span class="value achse3" id="leben-drift">0.00</span></div>
+    <!-- RECHTES PANEL: KREISLAUF (Feedback) -->
+    <div>
+      <div class="panel">
+        <h3>❓ AXIOM 3 · KREISLAUF (Feedback)</h3>
+        <div class="flex" style="font-size:8px;gap:6px">
+          <span>Q: <span id="qVal" style="color:#66ccff">0</span></span>
+          <span>D: <span id="dVal" style="color:#6bffa9">0</span></span>
+          <span>F: <span id="fVal" style="color:#ffd700">0</span></span>
+          <span style="color:#3d5a70">|</span>
+          <span>ROOT: <span id="rootVal" style="color:#6bffa9">0</span></span>
+          <span>ACHSE: <span id="achseVal" style="color:#66ccff">A</span></span>
+          <span>TMP: <span id="tmpVal" style="color:#ffd700">128</span></span>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>🔄 3×2 FENSTER · LIVE</h3>
+        <div id="liveWindow" style="display:grid;grid-template-columns:1fr 1fr;gap:2px;"></div>
+      </div>
+      <div class="panel">
+        <h3>🧮 3hit90 · MATRIX (81 → 243 → 729)</h3>
+        <div class="matrix-visual" id="matrixVisual">
+          <div class="row">
+            <span class="node" id="m81">81</span><span class="arrow">→</span>
+            <span class="node" id="m243">243</span><span class="arrow">→</span>
+            <span class="node" id="m729">729</span>
+          </div>
+          <div class="row" style="font-size:10px;color:#3d5a70;">
+            <span>ATOM</span><span style="width:40px;"></span>
+            <span>UNI</span><span style="width:40px;"></span>
+            <span>RUN</span>
+          </div>
+        </div>
+        <div class="flex">
+          <button id="btnCalcMatrix" class="matrix">📐 Matrix berechnen</button>
+          <button id="btnRandomMatrix" class="sec">🎲 Random</button>
+        </div>
+        <div style="font-size:8px;color:#5a7a8a;margin-top:4px;">
+          3hit90‑Formel: <span id="formulaDisplay" style="color:#ffd700;">3 × (Eingabe ÷ 6) × 90</span>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>⚽ Fußball → ♟️ Schach</h3>
+        <div class="football-input"><label>Tore</label><input type="number" id="goalsInput" value="2" min="0" max="10"><span class="result" id="goalsResult">→ 0</span></div>
+        <div class="football-input"><label>Schüsse</label><input type="number" id="shotsInput" value="12" min="0" max="30"><span class="result" id="shotsResult">→ 0</span></div>
+        <div class="football-input"><label>Ballbesitz %</label><input type="number" id="possessionInput" value="55" min="0" max="100"><span class="result" id="possessionResult">→ 0</span></div>
+        <div class="football-input"><label>Fouls</label><input type="number" id="foulsInput" value="8" min="0" max="20"><span class="result" id="foulsResult">→ 0</span></div>
+        <div class="flex">
+          <button id="btnCalcFootball" class="gold">📊 Umrechnen</button>
+          <button id="btnResetFootball" class="sec">⟲ Reset</button>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>⚡ SLIENERGIE · FLUSS</h3>
+        <div class="energy-bar"><div class="fill" id="sliEnergyBar">0%</div></div>
+        <div class="flex">
+          <button id="btnAddEnergy" class="cyan">⚡ + Energie</button>
+          <button id="btnResetEnergy" class="sec">⟲ Reset</button>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>🎛️ TÜFTEL · STEERING</h3>
+        <div style="display:flex;flex-direction:column;gap:4px;font-size:8px;">
+          <div class="flex"><span style="width:70px;">⏱️ Speed</span>
+            <input type="range" id="speedSlider" min="200" max="1500" value="700" step="50" style="flex:1;">
+            <span id="speedDisplay" style="width:50px;">700ms</span>
+          </div>
+          <div class="flex"><span style="width:70px;">🎯 Stil</span>
+            <select id="styleSelect" style="background:#1a1a2a;color:#d0d9e6;border:1px solid #2a2a3a;border-radius:4px;padding:2px;flex:1;">
+              <option value="random">🎲 Zufall</option>
+              <option value="aggressive">🔥 Aggressiv</option>
+              <option value="defensive">🛡️ Defensiv</option>
+              <option value="tactical" selected>🧠 Taktisch</option>
+            </select>
+          </div>
+          <div class="flex"><span style="width:70px;">💪 Stärke</span>
+            <input type="range" id="strengthSlider" min="1" max="5" value="3" step="1" style="flex:1;">
+            <span id="strengthDisplay" style="width:30px;">3</span>
+          </div>
+          <div class="flex" style="gap:4px;">
+            <button class="sec" id="btnGood" style="flex:1;">👍 Gut</button>
+            <button class="sec" id="btnBad" style="flex:1;">👎 Schlecht</button>
+            <button id="btnLearn" style="flex:1;">🧬 Lernen</button>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>📈 MASSNAHME · ERGEBNISSE</h3>
+        <pre id="resultDisplay" style="background:rgba(0,0,0,0.4);padding:8px;border-radius:6px;font-size:9px;line-height:1.3;color:#8ab4c8;max-height:100px;overflow:auto;">⏳ berechne...</pre>
+      </div>
     </div>
+
+  </div>
+
+  <div class="footer">
+    <span>♟️</span> AXIOM · URACHE · WIRKUNG · KREISLAUF · <span>wieimmer4u</span> ·
+    <a href="https://github.com/iki1uc/ANIME" target="_blank">GitHub</a>
   </div>
 </div>
 
-<!-- ===== DEUTUNGS‑PANEL ===== -->
-<div class="deutung-panel">
-  <h2>📖 DEUTUNG · ZEN‑INTERPRETATION & MESH‑LOG</h2>
-  <div id="deutung-output">▶ ULMR · Admin‑Pult bereit · warte auf Engine‑Daten …</div>
-</div>
-
-<!-- ===== STEUERUNGSZENTRALE ===== -->
-<div class="controls-zone">
-  <input id="attackInput" placeholder="SHOCK / WAVE / LINK / PUSH / GROW / MOVE / BREAK" />
-  <button class="attack" onclick="sendAttack()">⚡ SENDEN</button>
-  <button class="mesh" onclick="pauseLoop()">⏸ PAUSE</button>
-  <button class="mesh" onclick="stepLoop()">⏭ SCHRITT</button>
-  <button class="mesh" onclick="resetMesh()">⟲ RESET</button>
-  <button class="primary" onclick="toggleAuto()">▶ AUTO</button>
-  <span style="color:#666;font-size:9px;margin-left:4px;">Speed:</span>
-  <input type="range" id="speedSlider" min="1" max="10" value="3" style="width:80px;background:#1e242c;" />
-</div>
-
-<!-- ===== BOOT‑BLOCK‑MONITOR ===== -->
-<div class="boot-block-monitor">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-    <span style="color:var(--gold);font-size:11px;">🔗 BOOT.BLOCK LINK</span>
-    <span id="boot-status" style="color:#666;font-size:9px;">○ nicht verbunden</span>
-  </div>
-  <div class="row">
-    <div class="item">MODE <span id="boot-mode">—</span></div>
-    <div class="item">ACHSEN (A81) <span id="boot-achsen">—</span></div>
-    <div class="item">ZAHNRAD <span id="boot-gear">—</span></div>
-    <div class="item">ENERGIE <span id="boot-energy">—</span></div>
-    <div class="item"><button class="bootlink" onclick="reloadBootFrame()" style="background:#111;border:1px solid #333;color:#6ec8ff;padding:2px 10px;border-radius:4px;cursor:pointer;">🔄 neu laden</button></div>
-  </div>
-  <iframe id="bootFrame" src="master-boot-block.html" style="display:none;"></iframe>
-</div>
-
-<!-- ===== FOOTER ===== -->
-<div class="footer-admin">
-  <span>🧬 ULMR‑KERN: <span class="gold">3 · 9 · 81</span></span>
-  <span>🌀 ACHSEN: <span class="gold">WELT · KRAFT · LEBEN</span></span>
-  <span>⚡ ADMIN‑PULT · vollständig geöffnet</span>
-</div>
-
-<!-- ============================================================= -->
-<!-- =====  DIE DREI ENGINES LADEN (Reihenfolge: 3 → 9 → 81) ===== -->
-<!-- ============================================================= -->
-<script src="3.js"></script>
-<script src="9.js"></script>
-<script src="81.js"></script>
-
-<!-- ============================================================= -->
-<!-- =====  ADMIN‑PULT LOGIK (steuert die Engines) ================ -->
-<!-- ============================================================= -->
 <script>
-  (function() {
-    'use strict';
+"use strict";
 
-    // ---- DOM-Referenzen ----
-    const deutung = document.getElementById('deutung-output');
-    const bootStatus = document.getElementById('boot-status');
+// ================================================================
+// 0. SIMULIERTE IMPORTS (weil echte Dateien fehlen)
+// ================================================================
+const kernel = {
+  state: {},
+  set(key, val) { this.state[key] = val; },
+  get(key) { return this.state[key]; }
+};
+const MODULES = {
+  root: { label: 'ROOT', desc: 'BRAIN-Startzustand' },
+  core: { label: 'CORE', desc: 'Kernel · Axiom · Vec · NC-Suite' },
+  hdf: { label: 'HDF', desc: 'ROM-Speicher d/e/i/n/o/r/s/u/w' },
+  boerse: { label: 'BOERSE', file: '../BOERSE/index.html', desc: 'Börsen-Daten-Stage' },
+  dom: { label: 'DOM', file: '../DOM/index.html', desc: 'Dom-Struktur / NC-Raum' },
+  eos: { label: 'EOS', file: '../EOS/index.html', desc: 'EOS-Modul' },
+  evo: { label: 'EVO', file: '../EVO/index.html', desc: 'Evolution / Axiom-Map' },
+  markt: { label: 'MARKT', file: '../MARKT/index.html', desc: 'Marktsystem' },
+  respo: { label: 'RESPO', file: '../respo/index.html', desc: '9×9-Respo-Mesh, 81 Slots' },
+  tool48: { label: 'TOOL48', file: '../tool48/index.html', desc: 'Werkzeug 48' },
+  breite: { label: 'BREITE', file: null, desc: 'Achse Breite (X)' },
+  tiefe: { label: 'TIEFE', file: null, desc: 'Achse Tiefe (Z)' },
+  hoch: { label: 'HOCH', file: null, desc: 'Achse Höhe (Y)' }
+};
 
-    // ---- Hilfsfunktionen für Log ----
-    function logDeutung(msg, type = 'info') {
-      const time = new Date().toLocaleTimeString();
-      deutung.innerHTML += `[${time}] ${msg}\n`;
-      deutung.scrollTop = deutung.scrollHeight;
-      if (deutung.children.length > 50) deutung.innerHTML = deutung.innerHTML.split('\n').slice(-40).join('\n');
+// ================================================================
+// 1. UNO (3hit90-Matrix)
+// ================================================================
+const UNO = {
+  base: 3,
+  levels: { atom: 81, uni: 243, run: 729 },
+  hitFormula(input) {
+    const hits = Math.floor(input / 6);
+    return 3 * hits * 90;
+  },
+  atomLevel(input) {
+    const f = this.hitFormula(input);
+    return { level: 81, value: f * 81, mode: "ATOM" };
+  },
+  uniLevel(input) {
+    const f = this.hitFormula(input);
+    return { level: 243, value: f * 243, mode: "UNI.spier" };
+  },
+  runLevel(input) {
+    const f = this.hitFormula(input);
+    return { level: 729, value: f * 729, mode: "RUN" };
+  },
+  fullMatrix(input) {
+    return {
+      atom: this.atomLevel(input),
+      uni: this.uniLevel(input),
+      run: this.runLevel(input)
+    };
+  }
+};
+
+// ================================================================
+// 2. ATMO-BOARD (81-Slot)
+// ================================================================
+class AtmoBoard {
+  constructor(canvas, boardSize = 8) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+    this.boardSize = boardSize;
+    this.cellSize = canvas.width / boardSize;
+    this.angle = 0;
+    this.particles = [];
+    this.lines = [];
+    this.slots = [];
+    this.mood = 'anime';
+    this.running = true;
+    this.initSlots();
+    this.initLines();
+  }
+  initSlots() {
+    this.slots = [];
+    for (let i = 0; i < 81; i++) {
+      this.slots.push({ value: Math.sin(i * 0.2), pulse: 0, drift: 0, angle: 0 });
     }
-
-    // ---- 1. Engine‑Checks & Achsen‑Update ----
-    function updateAchsen() {
-      // Welt (3.js)
-      if (typeof window.ROUTER !== 'undefined') {
-        document.getElementById('welt-router').textContent = window.ROUTER.current || 'aktiv';
-      }
-      if (typeof window.STAGE !== 'undefined') {
-        document.getElementById('welt-stage').textContent = window.STAGE.mode || '3D';
-      }
-      if (typeof window.PLUGIN_CORE !== 'undefined') {
-        document.getElementById('welt-plugins').textContent = Object.keys(window.PLUGIN_CORE).length || '13';
-        document.getElementById('welt-badges').textContent = window.PLUGIN_CORE.activeCount || '0';
-      }
-
-      // Kraft (9.js)
-      if (typeof window.ATTACK_QUEUE !== 'undefined') {
-        document.getElementById('kraft-queue').textContent = window.ATTACK_QUEUE.length || 0;
-      }
-      if (typeof window.ZEN !== 'undefined') {
-        document.getElementById('kraft-zen').textContent = window.ZEN.status || 'bereit';
-      }
-      if (typeof window.INPUT_DISPATCHER !== 'undefined') {
-        document.getElementById('kraft-input').textContent = window.INPUT_DISPATCHER.mode || 'aktiv';
-      }
-
-      // Leben (81.js)
-      if (typeof window.MESH !== 'undefined') {
-        document.getElementById('leben-zellen').textContent = window.MESH.cells ? window.MESH.cells.length : 81;
-        document.getElementById('leben-tick').textContent = window.MESH.tick || 0;
-        document.getElementById('leben-vital').textContent = (window.MESH.vital || 0).toFixed(2);
-        document.getElementById('leben-drift').textContent = (window.MESH.drift || 0).toFixed(2);
+  }
+  updateSlots(time) {
+    for (let i = 0; i < 81; i++) {
+      const s = this.slots[i];
+      s.value = Math.sin(i * 0.2 + time * 0.001);
+      s.pulse = Math.sin(time / 120 + i * 0.1);
+      s.drift = Math.cos(time / 240 + i * 0.05);
+      s.angle = (time / 10 + i * 4) % 360;
+    }
+  }
+  initLines() {
+    this.lines = [];
+    for (let i = 0; i < 25; i++) {
+      const start = { x: Math.random() * this.canvas.width, y: Math.random() * this.canvas.height };
+      const end = { x: Math.random() * this.canvas.width, y: Math.random() * this.canvas.height };
+      this.lines.push({
+        start, end,
+        progress: Math.random(),
+        speed: 0.002 + Math.random() * 0.008,
+        width: 0.5 + Math.random() * 2.5,
+        color: `rgba(100,220,255,${0.05 + Math.random() * 0.2})`
+      });
+    }
+  }
+  setMood(mood) { this.mood = mood; }
+  resize(width, height) {
+    this.canvas.width = width;
+    this.canvas.height = height;
+    this.cellSize = width / this.boardSize;
+    this.initLines();
+  }
+  draw() {
+    const ctx = this.ctx, w = this.canvas.width, h = this.canvas.height, cs = this.cellSize, t = Date.now();
+    this.updateSlots(t);
+    ctx.fillStyle = `rgba(0,10,30,${0.05 + 0.08 * Math.sin(t/500)})`;
+    ctx.fillRect(0,0,w,h);
+    for (const line of this.lines) {
+      const p = (line.progress + t * line.speed * 0.001) % 1;
+      const waveY = Math.sin(p * Math.PI * 4 + t * 0.002) * 20;
+      const x1 = line.start.x + (line.end.x - line.start.x) * p;
+      const y1 = line.start.y + (line.end.y - line.start.y) * p + waveY;
+      const x2 = line.start.x + (line.end.x - line.start.x) * ((p + 0.15) % 1);
+      const y2 = line.start.y + (line.end.y - line.start.y) * ((p + 0.15) % 1) + Math.sin((p + 0.15) * Math.PI * 4 + t * 0.002) * 20;
+      ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2);
+      ctx.strokeStyle = line.color; ctx.lineWidth = line.width; ctx.stroke();
+    }
+    for (let r=0; r<this.boardSize; r++) {
+      for (let c=0; c<this.boardSize; c++) {
+        const idx = r*this.boardSize+c;
+        const slot = this.slots[idx] || { value:0, pulse:0, drift:0, angle:0 };
+        const x = c*cs, y = r*cs;
+        const val = slot.value*0.5+0.5, pulse = slot.pulse*0.3+0.7;
+        const hw = Math.sin(x*0.05 + t*0.001)*0.15+0.85;
+        const rCol = Math.floor(20 + val*60 + pulse*30*hw);
+        const gCol = Math.floor(80 + val*100 + pulse*50*hw);
+        const bCol = Math.floor(180 + val*50 + pulse*30*hw);
+        ctx.fillStyle = `rgba(${rCol},${gCol},${bCol},0.12)`;
+        ctx.fillRect(x,y,cs,cs);
+        const bp = 0.3 + 0.7 * Math.sin(t/300 + idx*0.1 + x*0.02);
+        ctx.strokeStyle = `rgba(${rCol+60},${gCol+60},${bCol+60},${0.05+0.1*bp})`;
+        ctx.lineWidth = 0.5 + bp*0.5; ctx.strokeRect(x,y,cs,cs);
+        const angleRad = slot.angle * Math.PI / 180;
+        const dotX = x + cs/2 + Math.cos(angleRad)*cs*0.3;
+        const dotY = y + cs/2 + Math.sin(angleRad)*cs*0.3 + Math.sin(t*0.002 + r*0.5)*2;
+        ctx.fillStyle = `rgba(255,255,255,${0.05+0.1*bp})`;
+        ctx.beginPath(); ctx.arc(dotX,dotY,1.5+bp,0,Math.PI*2); ctx.fill();
       }
     }
+    if (Math.random() > 0.94) {
+      const idx = Math.floor(Math.random()*this.boardSize*this.boardSize);
+      const slot = this.slots[idx] || { value:0, pulse:0, drift:0 };
+      const r = Math.floor(idx/this.boardSize), c = idx%this.boardSize;
+      const x = c*cs + cs/2, y = r*cs + cs/2 + Math.sin(t*0.003 + r)*5;
+      const angle = Math.random()*Math.PI*2, speed = 0.3+Math.random()*1.5;
+      this.particles.push({
+        x,y,
+        vx: Math.cos(angle)*speed + slot.drift*0.3,
+        vy: Math.sin(angle)*speed + Math.sin(t*0.002+idx)*0.3,
+        life:1,
+        size:1+Math.random()*3,
+        color: `rgba(${120+slot.value*60},${200+slot.pulse*40},255,${0.2+0.3*slot.pulse})`
+      });
+    }
+    this.particles = this.particles.filter(p => {
+      p.x += p.vx; p.y += p.vy; p.life -= 0.003;
+      if (p.life <= 0) return false;
+      ctx.fillStyle = p.color; ctx.globalAlpha = p.life;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.size*p.life,0,Math.PI*2); ctx.fill();
+      ctx.globalAlpha = 1;
+      return true;
+    });
+    const used = this.boardSize*this.boardSize;
+    const usedSlots = this.slots.slice(0, used);
+    const ready = usedSlots.filter(s => s.value >= -0.5 && s.value <= 0.5).length;
+    const errors = used - ready;
+    ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.fillRect(6,6,110,32);
+    ctx.fillStyle = ready === used ? '#6bffa9' : '#ffd700';
+    ctx.font = '9px monospace'; ctx.textAlign='left'; ctx.textBaseline='top';
+    ctx.fillText(`READY: ${ready}/${used}`, 10, 9);
+    ctx.fillStyle = errors > 0 ? '#ff6b8a' : '#6bffa9';
+    ctx.fillText(`ERRORS: ${errors}`, 10, 22);
+  }
+  start() { this.running = true; this.loop(); }
+  loop() { if (!this.running) return; this.draw(); requestAnimationFrame(()=>this.loop()); }
+  stop() { this.running = false; }
+}
 
-    // ---- 2. Boot‑Block‑Sync ----
-    function syncBootBlock() {
-      try {
-        const frame = document.getElementById('bootFrame');
-        const state = frame.contentWindow.STATE;
-        if (!state) throw new Error('STATE nicht bereit');
-        document.getElementById('boot-mode').textContent = state.mode || '—';
-        document.getElementById('boot-achsen').textContent = state.a81 || '—';
-        document.getElementById('boot-gear').textContent = state.gear || '—';
-        document.getElementById('boot-energy').textContent = (state.energy || 0) + '%';
-        bootStatus.textContent = '● verbunden';
-        bootStatus.style.color = '#4f4';
-      } catch (e) {
-        bootStatus.textContent = '○ nicht verbunden (Cross‑Origin oder Frame nicht geladen)';
-        bootStatus.style.color = '#666';
+// ================================================================
+// 3. ENGINE (Ursache & Wirkung)
+// ================================================================
+const engine = {
+  state: {
+    score:1000, pump:0, quote:0.5, predict:'IDLE',
+    cpuJump:0, cpuBias:'FORWARD', root:0, achse:'A', tmp:128,
+    q:27, d:81, f:243,
+    prefetchCount:0, predictCount:0, cacheCount:0
+  },
+  axles: 'deinorsuw'.split('').map(ch=>({name:ch,active:false})),
+  stations: ['HY','PE','PER','DA','NE','BEN','TRANS','WARB','KANAL'],
+  liveWindow: [['3','9'],['27','81'],['243','729']],
+  memory: { hits:0, misses:0, slides:[], jumps:[] },
+  feedback: { good: 0, bad: 0 },
+
+  log(msg, type='info') {
+    const el = document.getElementById('consoleLog');
+    const t = new Date().toLocaleTimeString();
+    const cls = type==='ok'?'log-ok':type==='warn'?'log-warn':type==='err'?'log-err':'log-info';
+    el.innerHTML += `<div class="${cls}">[${t}] ${msg}</div>`;
+    el.scrollTop = el.scrollHeight;
+    if (el.children.length > 30) el.removeChild(el.firstChild);
+  },
+
+  sync() {
+    const active = this.axles.filter(a=>a.active).length;
+    const s = this.state;
+    s.root = active;
+    s.achse = active>0 ? String.fromCharCode(64+active) : '0';
+    s.tmp = 128 - s.pump;
+    s.q = 3*active + (s.pump%7);
+    s.d = 9*active + Math.floor(s.pump/4);
+    s.f = 27*active + Math.floor(s.pump/2);
+    s.cpuJump = active + Math.floor(s.pump/8);
+    s.cpuBias = s.quote>0.6 ? 'FORWARD' : 'REVERSE';
+    s.predict = (active>0 && s.quote>0.4) ? 'ACTIVE' : 'IDLE';
+
+    if (s.cpuJump>0) { this.memory.hits++; s.predictCount++; this.memory.slides.push(active); this.memory.jumps.push(s.cpuJump); }
+    else { this.memory.misses++; }
+    s.quote = (this.memory.hits+1)/(this.memory.hits+this.memory.misses+2);
+
+    const vals = [3,9,27,81,243,729];
+    const shift = (s.root + s.pump + s.cpuJump) % 6;
+    this.liveWindow = [
+      [vals[shift%6], vals[(shift+1)%6]],
+      [vals[(shift+2)%6], vals[(shift+3)%6]],
+      [vals[(shift+4)%6], vals[(shift+5)%6]]
+    ];
+    s.prefetchCount++;
+    if (s.tmp>0) s.cacheCount++;
+    this.render();
+    this.syncChess();
+  },
+
+  syncChess() {
+    const active = this.axles.filter(a=>a.active).length;
+    const s = this.state;
+    const strength = Math.min(5, 1 + Math.floor(active/2) + Math.floor(s.pump/25));
+    document.getElementById('strengthSlider').value = strength;
+    document.getElementById('strengthDisplay').textContent = strength;
+    const style = s.cpuBias === 'FORWARD' ? 'aggressive' : (s.quote>0.5 ? 'tactical' : 'random');
+    document.getElementById('styleSelect').value = style;
+    const speed = Math.max(200, 1500 - s.pump * 10);
+    document.getElementById('speedSlider').value = speed;
+    document.getElementById('speedDisplay').textContent = speed+'ms';
+    const moodMap = { 'ACTIVE':'neon', 'IDLE':'cool' };
+    if (window.atmo) atmo.setMood(moodMap[s.predict] || 'anime');
+  },
+
+  render() {
+    this.renderAxles();
+    this.renderLiveWindow();
+    this.updateStatus();
+    this.updateMystery();
+    this.updateCPU();
+    this.updateMetrics();
+    this.renderResult();
+  },
+
+  renderAxles() {
+    const grid = document.getElementById('axleGrid');
+    grid.innerHTML = '';
+    this.axles.forEach((a,i) => {
+      const cell = document.createElement('div');
+      cell.className = 'axle-cell' + (a.active ? ' on' : ' off');
+      cell.textContent = a.name.toUpperCase();
+      cell.onclick = () => this.toggleAxle(i);
+      grid.appendChild(cell);
+    });
+  },
+
+  renderLiveWindow() {
+    const grid = document.getElementById('liveWindow');
+    if (!grid) return;
+    grid.innerHTML = '';
+    this.liveWindow.forEach(row => row.forEach(val => {
+      const cell = document.createElement('div');
+      cell.className = 'cell gold';
+      cell.textContent = val;
+      cell.style.cssText = 'background:#2a1a0a;color:#ffd700;border-color:#ffd700;padding:4px;text-align:center;font-size:8px;border:1px solid #111;border-radius:3px;';
+      grid.appendChild(cell);
+    }));
+  },
+
+  updateStatus() {
+    document.getElementById('scoreVal').textContent = this.state.score;
+    document.getElementById('pumpVal').textContent = this.state.pump;
+    document.getElementById('quoteVal').textContent = Math.round(this.state.quote*100)+'%';
+    document.getElementById('predictVal').textContent = this.state.predict;
+  },
+
+  updateMystery() {
+    document.getElementById('qVal').textContent = this.state.q;
+    document.getElementById('dVal').textContent = this.state.d;
+    document.getElementById('fVal').textContent = this.state.f;
+    document.getElementById('rootVal').textContent = this.state.root;
+    document.getElementById('achseVal').textContent = this.state.achse;
+    document.getElementById('tmpVal').textContent = this.state.tmp;
+  },
+
+  updateCPU() {
+    document.getElementById('cpuStatus').textContent = this.state.predict==='ACTIVE'?'ACTIVE':'IDLE';
+    document.getElementById('cpuBias').textContent = this.state.cpuBias;
+    document.getElementById('cpuJump').textContent = this.state.cpuJump;
+  },
+
+  updateMetrics() {
+    document.getElementById('prefetchCount').textContent = this.state.prefetchCount;
+    document.getElementById('predictCount').textContent = this.state.predictCount;
+    document.getElementById('cacheCount').textContent = this.state.cacheCount;
+  },
+
+  renderResult() {
+    const el = document.getElementById('resultDisplay');
+    if (!el) return;
+    const active = this.axles.filter(a=>a.active).length;
+    const s = this.state;
+    el.textContent =
+`MASSNAHME · IKI1UC
+─────────────────
+aktive Achsen : ${active} / 9
+Pump-Stack    : ${s.pump} / 128
+Trefferquote  : ${Math.round(s.quote*100)}%
+Predict       : ${s.predict}
+Sprung        : ${s.cpuJump}
+Bias          : ${s.cpuBias}
+ROOT          : ${s.root}
+ACHSE         : ${s.achse}
+TMP           : ${s.tmp}
+Q:${s.q}  D:${s.d}  F:${s.f}
+PREFETCH:${s.prefetchCount}  PREDICT:${s.predictCount}  CACHE:${s.cacheCount}`;
+  },
+
+  toggleAxle(i) {
+    this.axles[i].active = !this.axles[i].active;
+    this.log(`achse ${this.axles[i].name} → ${this.axles[i].active ? 'ON' : 'OFF'}`, 'info');
+    this.sync();
+  },
+
+  pumpCycle() {
+    const active = this.axles.filter(a=>a.active).length;
+    if (active===0) { this.log('❗ keine achse aktiv — pump gestoppt','err'); return; }
+    this.stations.forEach((st,i) => {
+      if ((this.state.pump+i)%3===0) {
+        this.log(`🔷 STATION ${st} → BOOST`,'ok');
+        this.state.score += (active*(i+1));
+      }
+    });
+    this.state.pump = Math.min(this.state.pump+active, 128);
+    this.state.score += active*2;
+    this.log(`💨 PUMP · stack=${this.state.pump}`,'ok');
+    this.sync();
+  },
+
+  runGeneral() {
+    this.axles.forEach(a=>a.active=true);
+    for (let i=0; i<3; i++) { this.state.pump=Math.min(this.state.pump+9,128); this.state.score+=9*2; }
+    this.state.score+=50;
+    this.log('⚡ GENERAL RUN · alles aktiv · score+50','ok');
+    this.sync();
+  },
+
+  toggleAll() {
+    const allOn = this.axles.every(a=>a.active);
+    this.axles.forEach(a=>a.active=!allOn);
+    this.log(`🔄 ALL TOGGLE → ${allOn?'OFF':'ON'}`,'info');
+    this.sync();
+  },
+
+  randomize() {
+    this.axles.forEach(a=>a.active=Math.random()>0.5);
+    this.state.score = Math.floor(Math.random()*500)+500;
+    this.state.pump = Math.floor(Math.random()*30);
+    this.log('🎲 RANDOM · neuer zustand','warn');
+    this.sync();
+  },
+
+  loopAll() {
+    this.axles.forEach(a=>a.active=!a.active);
+    this.state.pump = Math.min(this.state.pump+this.axles.filter(a=>a.active).length, 128);
+    this.log('♾ LOOP-ALL · orbit complete','ok');
+    this.sync();
+  },
+
+  resetAll() {
+    this.axles.forEach(a=>a.active=false);
+    Object.assign(this.state, {
+      score:1000, pump:0, quote:0.5, predict:'IDLE', cpuJump:0,
+      cpuBias:'FORWARD', root:0, achse:'0', tmp:128, q:27, d:81, f:243,
+      prefetchCount:0, predictCount:0, cacheCount:0
+    });
+    this.memory = { hits:0, misses:0, slides:[], jumps:[] };
+    this.liveWindow = [['3','9'],['27','81'],['243','729']];
+    document.getElementById('consoleLog').innerHTML = '⏳ system zurückgesetzt...';
+    this.log('⟲ RESET · komplett neu','ok');
+    this.render();
+  },
+
+  init() {
+    this.log('⭐ AXIOM · URACHE · WIRKUNG · KREISLAUF','ok');
+    this.log('📊 vereinheitlichte sync()-Logik für alle Aktionen','info');
+    this.render();
+    setInterval(() => { if (this.axles.some(a=>a.active)) this.pumpCycle(); }, 8000);
+  }
+};
+
+// ================================================================
+// 4. SCHACHLOGIK (Queen fixed)
+// ================================================================
+function inBounds(r,c){ return r>=0 && r<8 && c>=0 && c<8; }
+function getPseudoLegalMoves(board, r, c, pieceOverride) {
+  const piece = pieceOverride || board[r][c];
+  if (!piece) return [];
+  const moves = [];
+  const enemy = piece.color === 'white' ? 'black' : 'white';
+  const add = (nr,nc) => {
+    if (inBounds(nr,nc)) {
+      const target = board[nr][nc];
+      if (!target || target.color === enemy) moves.push({r:nr,c:nc});
+    }
+  };
+  switch(piece.type) {
+    case 'pawn': {
+      const dir = piece.color==='white'?-1:1;
+      if (inBounds(r+dir,c) && !board[r+dir][c]) moves.push({r:r+dir,c});
+      if ((piece.color==='white'&&r===6)||(piece.color==='black'&&r===1)) {
+        if (!board[r+dir][c] && !board[r+2*dir][c]) moves.push({r:r+2*dir,c});
+      }
+      for (const dc of [-1,1]) {
+        const nr=r+dir, nc=c+dc;
+        if (inBounds(nr,nc) && board[nr][nc] && board[nr][nc].color===enemy)
+          moves.push({r:nr,c:nc});
+      }
+      break;
+    }
+    case 'rook': {
+      for (const [dr,dc] of [[-1,0],[1,0],[0,-1],[0,1]]) {
+        for (let i=1; i<8; i++) {
+          const nr=r+dr*i, nc=c+dc*i;
+          if (!inBounds(nr,nc)) break;
+          const target=board[nr][nc];
+          if (!target) moves.push({r:nr,c:nc});
+          else { if (target.color===enemy) moves.push({r:nr,c:nc}); break; }
+        }
+      }
+      break;
+    }
+    case 'knight': {
+      for (const [dr,dc] of [[1,2],[2,1],[-1,2],[-2,1],[1,-2],[2,-1],[-1,-2],[-2,-1]])
+        add(r+dr,c+dc);
+      break;
+    }
+    case 'bishop': {
+      for (const [dr,dc] of [[1,1],[1,-1],[-1,1],[-1,-1]]) {
+        for (let i=1; i<8; i++) {
+          const nr=r+dr*i, nc=c+dc*i;
+          if (!inBounds(nr,nc)) break;
+          const target=board[nr][nc];
+          if (!target) moves.push({r:nr,c:nc});
+          else { if (target.color===enemy) moves.push({r:nr,c:nc}); break; }
+        }
+      }
+      break;
+    }
+    case 'queen': {
+      const rookMoves = getPseudoLegalMoves(board, r, c, {type:'rook',color:piece.color});
+      const bishopMoves = getPseudoLegalMoves(board, r, c, {type:'bishop',color:piece.color});
+      return [...rookMoves, ...bishopMoves];
+    }
+    case 'king': {
+      for (const [dr,dc] of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]])
+        add(r+dr,c+dc);
+      break;
+    }
+  }
+  return moves;
+}
+function selectMoveByStyle(board, moves, style, strength, movingColor) {
+  if (moves.length===0) return null;
+  if (style==='random') return moves[Math.floor(Math.random()*moves.length)];
+  const scored = moves.map(m => {
+    let score = 0;
+    const target = board[m.r][m.c];
+    if (target && target.color !== movingColor) score += 10;
+    const centerDist = Math.abs(m.r-3.5) + Math.abs(m.c-3.5);
+    score += (7-centerDist)*0.5;
+    if (style==='aggressive') score += Math.random()*5;
+    if (style==='defensive') score += (movingColor==='white' ? m.r : 7-m.r)*0.5;
+    if (style==='tactical') score += Math.random()*8 + (moves.length*0.1);
+    return {...m, score};
+  });
+  scored.sort((a,b)=>b.score-a.score);
+  const topN = Math.min(moves.length, Math.ceil(1+(5-strength)*0.5));
+  return scored[Math.floor(Math.random()*topN)];
+}
+
+// ================================================================
+// 5. SCHACHBRETT & RENDER
+// ================================================================
+let board = [];
+let currentColor = 'white';
+let currentGameMoves = [];
+let moveIndex = 0;
+let currentGame = null;
+let autoMode = false;
+let moveSpeed = 700;
+let animations = [];
+
+const canvas = document.getElementById('chessCanvas');
+const ctx = canvas.getContext('2d');
+const atmoCanvas = document.getElementById('atmoCanvas');
+const atmo = new AtmoBoard(atmoCanvas, 8);
+window.atmo = atmo;
+
+function initBoard() {
+  const backRankW = ['♖','♘','♗','♕','♔','♗','♘','♖'];
+  const backRankB = ['♜','♞','♝','♛','♚','♝','♞','♜'];
+  const types = ['rook','knight','bishop','queen','king','bishop','knight','rook'];
+  board = [];
+  for (let r=0; r<8; r++) {
+    const row = [];
+    for (let c=0; c<8; c++) {
+      let piece=null, color=null, type=null;
+      if (r===0) { piece=backRankW[c]; color='white'; type=types[c]; }
+      else if (r===1) { piece='♟'; color='white'; type='pawn'; }
+      else if (r===6) { piece='♟'; color='black'; type='pawn'; }
+      else if (r===7) { piece=backRankB[c]; color='black'; type=types[c]; }
+      row.push({ piece, color, type });
+    }
+    board.push(row);
+  }
+  currentColor = 'white';
+}
+function resizeCanvases() {
+  const rect = canvas.parentElement.getBoundingClientRect();
+  const s = Math.min(rect.width, rect.height, 320);
+  canvas.width = s; canvas.height = s;
+  atmo.resize(s, s);
+  renderBoard();
+}
+window.addEventListener('resize', resizeCanvases);
+function renderBoard() {
+  const w=canvas.width, h=canvas.height, cs=w/8;
+  ctx.clearRect(0,0,w,h);
+  for (let r=0; r<8; r++) {
+    for (let c=0; c<8; c++) {
+      const x=c*cs, y=r*cs;
+      const p = board[r][c];
+      if (p && p.piece) {
+        ctx.font = `${cs*0.6}px 'Segoe UI','Arial Unicode MS',sans-serif`;
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.shadowColor = 'rgba(100,200,180,0.02)'; ctx.shadowBlur = 6;
+        ctx.fillStyle = p.color==='white'?'#ddeeee':'#1a2a2a';
+        ctx.fillText(p.piece, x+cs/2, y+cs/2+2);
+        ctx.shadowBlur = 0;
       }
     }
+  }
+}
+function animateMove(from, to, piece, callback) {
+  const cs = canvas.width/8;
+  const startX = from.c*cs + cs/2, startY = from.r*cs + cs/2;
+  const endX = to.c*cs + cs/2, endY = to.r*cs + cs/2;
+  const startTime = performance.now();
+  for (let i=0; i<15; i++) {
+    const angle = Math.random()*Math.PI*2, speed = 0.5+Math.random()*2;
+    atmo.particles.push({
+      x: (startX+endX)/2, y: (startY+endY)/2,
+      vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed,
+      life:1, size:2+Math.random()*3,
+      color: `rgba(150,220,255,${0.3+Math.random()*0.5})`
+    });
+  }
+  animations.push({ piece, from, to, startX,startY,endX,endY, startTime, duration:moveSpeed, callback });
+  if (animations.length===1) renderLoop();
+}
+function renderLoop() {
+  const now = performance.now();
+  const cs = canvas.width/8;
+  renderBoard();
+  animations = animations.filter(anim => {
+    const p = Math.min((now-anim.startTime)/anim.duration, 1);
+    const x = anim.startX + (anim.endX-anim.startX)*p;
+    const y = anim.startY + (anim.endY-anim.startY)*p;
+    ctx.font = `${cs*0.6}px 'Segoe UI','Arial Unicode MS',sans-serif`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(255,215,0,0.3)'; ctx.shadowBlur = 16;
+    ctx.fillStyle = anim.piece.color==='white'?'#ddeeee':'#1a2a2a';
+    ctx.fillText(anim.piece.piece, x, y+2);
+    ctx.shadowBlur = 0;
+    if (p>=1) {
+      board[anim.to.r][anim.to.c] = anim.piece;
+      board[anim.from.r][anim.from.c] = { piece:null, color:null, type:null };
+      if (anim.callback) anim.callback();
+      return false;
+    }
+    return true;
+  });
+  if (animations.length>0) requestAnimationFrame(renderLoop);
+}
 
-    window.reloadBootFrame = function() {
-      document.getElementById('bootFrame').src = document.getElementById('bootFrame').src;
-      logDeutung('🔄 BOOT.BLOCK‑Frame neu geladen');
-    };
-
-    // ---- 3. Steuerungsfunktionen (verknüpfen mit Engines) ----
-    window.sendAttack = function() {
-      const input = document.getElementById('attackInput');
-      const cmd = input.value.trim();
-      if (!cmd) return;
-      if (typeof window.processZEN === 'function') {
-        window.processZEN(cmd);
-        logDeutung(`⚡ Attack: ${cmd} → ZEN verarbeitet`);
-      } else if (typeof window.dispatchAttack === 'function') {
-        window.dispatchAttack(cmd);
-        logDeutung(`⚡ Attack: ${cmd} → dispatchAttack`);
-      } else {
-        logDeutung(`⚠️ Keine Attack‑Engine gefunden. Befehl: ${cmd}`, 'warn');
-      }
-      input.value = '';
-      updateAchsen();
-    };
-
-    window.pauseLoop = function() {
-      if (typeof window.togglePause === 'function') {
-        window.togglePause();
-        logDeutung('⏸ Pause umgeschaltet');
-      } else {
-        logDeutung('⚠️ togglePause() nicht gefunden', 'warn');
-      }
-    };
-
-    window.stepLoop = function() {
-      if (typeof window.stepTick === 'function') {
-        window.stepTick();
-        logDeutung('⏭ Einzelner Tick ausgeführt');
-        updateAchsen();
-      } else {
-        logDeutung('⚠️ stepTick() nicht gefunden', 'warn');
-      }
-    };
-
-    window.resetMesh = function() {
-      if (typeof window.resetGrid === 'function') {
-        window.resetGrid();
-        logDeutung('⟲ Mesh zurückgesetzt');
-        updateAchsen();
-      } else {
-        logDeutung('⚠️ resetGrid() nicht gefunden', 'warn');
-      }
-    };
-
-    let autoInterval = null;
-    window.toggleAuto = function() {
-      if (autoInterval) {
-        clearInterval(autoInterval);
-        autoInterval = null;
-        logDeutung('⏸ AUTO‑Modus deaktiviert');
+function generateGames(n) {
+  const g = [];
+  const names = ['Unsterbliche','Opernpartie','Evergreen','Match des Jahrhunderts','Kasparov vs. Deep Blue','Unsterbliche Remis','Schäferzug','Läufer-Coup','Pferde-Tour','Opfer von Anderssen','Remis-Partie','Königsangriff','Damen-Oper','Turm-Sprung','Bauern-Welle','Verteidigung von Berlin'];
+  const emotions = ['😱','🎭','🌿','❄️','🤖','⚖️','🐴','♝','🐑','💥'];
+  for (let i=0; i<n; i++) {
+    const name = names[i%names.length]+(i>15?` (${i+1})`:''); const theme = ['pferd','opfer','remis','laufer','schafer','könig','dame','turm','bauer'][i%9];
+    const moves = [];
+    for (let j=0; j<12+Math.floor(Math.random()*25); j++) {
+      const from = String.fromCharCode(97+Math.floor(Math.random()*8))+(1+Math.floor(Math.random()*8));
+      const to = String.fromCharCode(97+Math.floor(Math.random()*8))+(1+Math.floor(Math.random()*8));
+      const piece = ['♟','♞','♝','♜','♛','♚'][Math.floor(Math.random()*6)];
+      moves.push({ piece, from, to, notation:`${from}→${to}`, type:['pawn','knight','bishop','rook','queen','king'][['♟','♞','♝','♜','♛','♚'].indexOf(piece)], color: j%2===0?'white':'black' });
+    }
+    const winner = ['Weiß','Schwarz','Remis'][Math.floor(Math.random()*3)];
+    g.push({ id:i, name, year:1800+Math.floor(Math.random()*200), theme, moves, winner, emotion: emotions[i%emotions.length], players:`Meister ${i+1} vs. ${i+2}` });
+  }
+  return g;
+}
+let allGames = generateGames(30), filtered = [...allGames];
+function loadGame(game) {
+  initBoard(); currentGameMoves = game.moves.slice(); moveIndex = 0; currentGame = game; currentColor = 'white';
+  document.getElementById('totalMoves').textContent = '∞'; document.getElementById('moveCount').textContent = '0';
+  document.getElementById('turnIndicator').textContent = 'Weiß'; document.getElementById('manaIndicator').textContent = '0';
+  renderBoard();
+}
+function collectAllMoves(color) {
+  const all = [];
+  for (let r=0; r<8; r++) for (let c=0; c<8; c++) {
+    const p = board[r][c];
+    if (p && p.color === color) {
+      const moves = getPseudoLegalMoves(board, r, c);
+      if (moves.length) all.push({ from:{r,c}, tos: moves, piece: p });
+    }
+  }
+  return all;
+}
+function playNextMove() {
+  if (!currentGame) return;
+  const style = document.getElementById('styleSelect').value;
+  const strength = parseInt(document.getElementById('strengthSlider').value, 10) || 3;
+  const candidates = collectAllMoves(currentColor);
+  if (candidates.length === 0) { engine.log(`❗ ${currentColor==='white'?'Weiß':'Schwarz'} hat keinen legalen Zug mehr`,'err'); if (autoMode) stopAuto(); return; }
+  let best = null, bestScore = -Infinity;
+  for (const cand of candidates) {
+    const chosen = selectMoveByStyle(board, cand.tos, style, strength, currentColor);
+    if (!chosen) continue;
+    const target = board[chosen.r][chosen.c];
+    const roll = Math.random() * 3 + (target ? 12 : 0);
+    if (roll > bestScore) { bestScore = roll; best = { from: cand.from, to: chosen, piece: cand.piece }; }
+  }
+  if (!best) { if (autoMode) stopAuto(); return; }
+  const captured = board[best.to.r][best.to.c];
+  const movingColor = currentColor;
+  animateMove(best.from, best.to, best.piece, () => {
+    if (best.piece.type === 'pawn' && (best.to.r === 0 || best.to.r === 7)) {
+      board[best.to.r][best.to.c] = { piece: movingColor==='white'?'♕':'♛', color: movingColor, type:'queen' };
+      engine.log(`♛ Bauer wird zur Dame (${movingColor==='white'?'Weiß':'Schwarz'})`,'ok');
+    }
+    moveIndex++; document.getElementById('moveCount').textContent = moveIndex;
+    if (captured) {
+      engine.log(`⚔️ Schlagzug auf ${String.fromCharCode(97+best.to.c)}${8-best.to.r}`,'warn');
+      if (captured.type === 'king') {
+        engine.log(`🏆 ${movingColor==='white'?'Weiß':'Schwarz'} gewinnt durch Königsschlag!`,'ok');
+        if (autoMode) stopAuto();
         return;
       }
-      const speed = parseInt(document.getElementById('speedSlider').value) || 3;
-      const delay = Math.max(200, 2000 / speed);
-      autoInterval = setInterval(() => {
-        if (typeof window.stepTick === 'function') {
-          window.stepTick();
-          updateAchsen();
-        }
-      }, delay);
-      logDeutung(`▶ AUTO‑Modus aktiv (Speed ${speed}, ${delay}ms)`);
-    };
-
-    // ---- 4. Initialisierung der Engines (wenn verfügbar) ----
-    function initEngines() {
-      let ok = true;
-      try {
-        if (typeof initMesh === 'function') { initMesh(); logDeutung('✅ 81.js · Mesh initialisiert'); }
-        else { logDeutung('⚠️ initMesh() nicht gefunden', 'warn'); ok = false; }
-        if (typeof initUI === 'function') { initUI(); logDeutung('✅ 3.js · UI initialisiert'); }
-        else { logDeutung('⚠️ initUI() nicht gefunden', 'warn'); ok = false; }
-        if (typeof initZEN === 'function') { initZEN(); logDeutung('✅ 9.js · ZEN initialisiert'); }
-        else { logDeutung('⚠️ initZEN() nicht gefunden', 'warn'); ok = false; }
-        if (typeof startLoop === 'function') { startLoop(); logDeutung('✅ Tick‑Loop gestartet'); }
-        else { logDeutung('⚠️ startLoop() nicht gefunden', 'warn'); ok = false; }
-      } catch (e) {
-        logDeutung(`❌ Fehler beim Initialisieren: ${e.message}`, 'error');
-        ok = false;
-      }
-      if (ok) {
-        logDeutung('🚀 ULMR · Alle drei Achsen sind aktiv.');
-      } else {
-        logDeutung('⚠️ Einige Engine‑Funktionen fehlen – simuliere Basiswerte.', 'warn');
-        // Fallback‑Simulation, damit das UI nicht leer bleibt
-        window.MESH = window.MESH || { cells: Array(81).fill(0), tick: 0, vital: 0.5, drift: 0.1 };
-        window.ATTACK_QUEUE = window.ATTACK_QUEUE || [];
-        window.ZEN = window.ZEN || { status: 'simuliert' };
-        window.ROUTER = window.ROUTER || { current: 'simuliert' };
-        window.PLUGIN_CORE = window.PLUGIN_CORE || { activeCount: 0 };
-      }
-      updateAchsen();
     }
+    currentColor = movingColor === 'white' ? 'black' : 'white';
+    document.getElementById('turnIndicator').textContent = currentColor==='white'?'Weiß':'Schwarz';
+    document.getElementById('manaIndicator').textContent = moveIndex;
+    if (autoMode) setTimeout(playNextMove, moveSpeed);
+  });
+}
+function stopAuto() { autoMode=false; document.getElementById('btnAuto').textContent='▶ Auto'; }
+function spawnEffect(x,y,type) {
+  const el = document.createElement('div');
+  const symbols = { ice:'❄️', water:'💧', fire:'🔥' };
+  el.textContent = symbols[type] || '✨';
+  el.style.cssText = `position:fixed; pointer-events:none; font-size:32px; z-index:9999; left:${x-16}px; top:${y-16}px; opacity:0.8; animation: floatUp 0.8s ease-out forwards;`;
+  document.body.appendChild(el); setTimeout(()=>el.remove(), 800);
+}
 
-    // ---- 5. Taktgeber ----
-    setInterval(() => {
-      updateAchsen();
-      syncBootBlock();
-    }, 500);
+// ================================================================
+// 6. SAISON, MATRIX, FUSSBALL, ENERGIE
+// ================================================================
+const SAISON = { spieltag:1, tore:0, punkte:0, spiele:[] };
+function nextSpieltag() { SAISON.spieltag++; const ergebnis = `${Math.floor(Math.random()*5)}:${Math.floor(Math.random()*5)}`; SAISON.spiele.push({ tag:SAISON.spieltag, ergebnis }); return { tag:SAISON.spieltag, ergebnis }; }
+function tor() { SAISON.tore++; }
+function punkt() { SAISON.punkte++; }
+function resetSaison() { SAISON.spieltag=1; SAISON.tore=0; SAISON.punkte=0; SAISON.spiele=[]; }
+function renderSaisonUI() { document.getElementById('spieltag').textContent = SAISON.spieltag; document.getElementById('tore').textContent = SAISON.tore; document.getElementById('punkte').textContent = SAISON.punkte; }
 
-    // ---- 6. Uhr ----
-    function updateClock() {
-      document.getElementById('sys-clock').textContent = `⏱️ ${new Date().toLocaleTimeString()}`;
+let sliEnergy = 0; const MAX_ENERGY = 100;
+function addEnergy(amount=6) { sliEnergy = Math.min(MAX_ENERGY, sliEnergy + amount); updateEnergyUI(); }
+function resetEnergy() { sliEnergy = 0; updateEnergyUI(); }
+function updateEnergyUI() { const bar = document.getElementById('sliEnergyBar'); const pct = Math.round((sliEnergy / MAX_ENERGY) * 100); bar.style.width = pct + '%'; bar.textContent = pct + '%'; }
+
+function renderMatrix(input) {
+  const matrix = UNO.fullMatrix(input);
+  document.getElementById('m81').textContent = matrix.atom.value.toFixed(0);
+  document.getElementById('m243').textContent = matrix.uni.value.toFixed(0);
+  document.getElementById('m729').textContent = matrix.run.value.toFixed(0);
+  const hits = Math.floor(input / 6);
+  document.getElementById('formulaDisplay').textContent = `3 × ${hits} × 90 = ${3*hits*90}`;
+}
+function convertFootballToChess(value) { const hit = Math.floor(value / 6); return 3 * hit * 90; }
+function updateFootballResults() {
+  const goals = parseInt(document.getElementById('goalsInput').value) || 0;
+  const shots = parseInt(document.getElementById('shotsInput').value) || 0;
+  const possession = parseInt(document.getElementById('possessionInput').value) || 0;
+  const fouls = parseInt(document.getElementById('foulsInput').value) || 0;
+  const total = goals + shots + possession + fouls;
+  document.getElementById('goalsResult').textContent = `→ ${convertFootballToChess(goals)}`;
+  document.getElementById('shotsResult').textContent = `→ ${convertFootballToChess(shots)}`;
+  document.getElementById('possessionResult').textContent = `→ ${convertFootballToChess(possession)}`;
+  document.getElementById('foulsResult').textContent = `→ ${convertFootballToChess(fouls)}`;
+  renderMatrix(total);
+}
+function resetFootball() {
+  document.getElementById('goalsInput').value = 2;
+  document.getElementById('shotsInput').value = 12;
+  document.getElementById('possessionInput').value = 55;
+  document.getElementById('foulsInput').value = 8;
+  updateFootballResults();
+}
+
+let engineTick = 0;
+function updateClock() { document.getElementById('engineTicks').textContent = engineTick; }
+
+// ================================================================
+// 7. RUN3 – 90 Ticks (NUR EIN TOGGLE-LISTENER)
+// ================================================================
+let run3Timer = null, run3Running = false, run3Tick = 0;
+const run3Story = [
+  { tick: 0, msg: "RUN 3 aktiviert – taktischer Modus geladen.", type:"story" },
+  { tick: 1, msg: "sli.power gesetzt → +6% Energie.", type:"event" },
+  { tick: 2, msg: "Ghost‑L2 scannt Module → RESPO fehlt → Reparatur eingeleitet.", type:"event" },
+  { tick: 3, msg: "Pipeline 6 startet aggressiv → Slienergie 14%.", type:"story" },
+  { tick: 4, msg: "Pipeline 3 bleibt stabil → Slienergie 6%.", type:"story" },
+  { tick: 5, msg: "Dashboard: A=2, B=1, Hits=1.", type:"story" },
+  { tick: 6, msg: "Pipeline 6 überlastet AXI → Fehlerquote 8%.", type:"story" },
+  { tick: 7, msg: "Ghost‑L2 repariert AXI.", type:"event" },
+  { tick: 8, msg: "ATOM Spin 144° → charge 10.", type:"story" },
+  { tick: 9, msg: "UNI.spier Zustand DRIN → Routing stabil.", type:"story" },
+  { tick: 10, msg: "Slienergie Pipeline 6 → 22%.", type:"story" },
+  { tick: 11, msg: "Slienergie Pipeline 3 → 12%.", type:"story" },
+  { tick: 12, msg: "QDF berechnet: 29.4 → stabil.", type:"story" },
+  { tick: 13, msg: "Pipeline 6 erreicht Peak‑Speed.", type:"story" },
+  { tick: 14, msg: "Dashboard: A=3, B=2, Hits=2.", type:"story" },
+  { tick: 15, msg: "⚡ TOR! Saison‑Engine → Tore = 1.", type:"event" },
+  { tick: 16, msg: "Pipeline 6 beginnt zu schwanken → Fehlerquote 14%.", type:"story" },
+  { tick: 17, msg: "Pipeline 3 setzt Zyklus‑Schritt 2.", type:"story" },
+  { tick: 18, msg: "Slienergie +6 → 18%.", type:"event" },
+  { tick: 19, msg: "Ghost‑L2 scannt → TEM instabil.", type:"story" },
+  { tick: 20, msg: "Ghost‑L2 repariert TEM.", type:"event" },
+  { tick: 21, msg: "Pipeline 6 überhitzt → Slienergie 41%.", type:"story" },
+  { tick: 22, msg: "Pipeline 3 bleibt taktisch → Slienergie 18%.", type:"story" },
+  { tick: 23, msg: "Dashboard: A=4, B=3, Hits=3.", type:"story" },
+  { tick: 24, msg: "🏆 Punkt! Saison‑Engine → Punkte = 1.", type:"event" },
+  { tick: 25, msg: "Pipeline 6 verliert Kontrolle → Fehlerquote 22%.", type:"story" },
+  { tick: 26, msg: "Pipeline 3 setzt Zyklus‑Schritt 4.", type:"story" },
+  { tick: 27, msg: "Slienergie Pipeline 3 → 24%.", type:"story" },
+  { tick: 28, msg: "Pipeline 6 fällt auf 33% Effizienz.", type:"story" },
+  { tick: 29, msg: "Ghost‑L2 repariert TriAxiom erneut.", type:"event" },
+  { tick: 30, msg: "Pipeline 3 übernimmt das Spiel.", type:"story" },
+  { tick: 31, msg: "Pipeline 6 versucht Gegenangriff → ineffizient.", type:"story" },
+  { tick: 32, msg: "Slienergie Pipeline 6 → 55%.", type:"story" },
+  { tick: 33, msg: "Pipeline 3 bleibt bei 26%.", type:"story" },
+  { tick: 34, msg: "Dashboard: A=5, B=4, Hits=4.", type:"story" },
+  { tick: 35, msg: "⚡ TOR! → Tore = 2.", type:"event" },
+  { tick: 36, msg: "Pipeline 6 Fehlerquote → 28%.", type:"story" },
+  { tick: 37, msg: "Pipeline 3 setzt Zyklus‑Schritt 6.", type:"story" },
+  { tick: 38, msg: "UNI.spier stabilisiert Routing.", type:"story" },
+  { tick: 39, msg: "ATOM Spin 222°.", type:"story" },
+  { tick: 40, msg: "Slienergie Pipeline 3 → 32%.", type:"story" },
+  { tick: 41, msg: "Pipeline 6 überhitzt erneut → 61%.", type:"story" },
+  { tick: 42, msg: "Ghost‑L2 repariert RESPO.", type:"event" },
+  { tick: 43, msg: "Dashboard: A=6, B=5, Hits=5.", type:"story" },
+  { tick: 44, msg: "Pipeline 3 bleibt präzise.", type:"story" },
+  { tick: 45, msg: "Halbzeit – RUN 3 führt klar.", type:"story" },
+  { tick: 46, msg: "Pipeline 6 startet zweite Druckphase.", type:"story" },
+  { tick: 47, msg: "Slienergie Pipeline 6 → 70%.", type:"story" },
+  { tick: 48, msg: "Pipeline 3 → 36%.", type:"story" },
+  { tick: 49, msg: "Dashboard: A=7, B=6, Hits=6.", type:"story" },
+  { tick: 50, msg: "🏆 Punkt! → Punkte = 2.", type:"event" },
+  { tick: 51, msg: "Pipeline 6 Fehlerquote → 31%.", type:"story" },
+  { tick: 52, msg: "Pipeline 3 setzt Zyklus‑Schritt 7.", type:"story" },
+  { tick: 53, msg: "Ghost‑L2 scannt → alle Module OK.", type:"story" },
+  { tick: 54, msg: "Slienergie Pipeline 3 → 42%.", type:"story" },
+  { tick: 55, msg: "Pipeline 6 verliert Tempo.", type:"story" },
+  { tick: 56, msg: "Dashboard: A=8, B=7, Hits=7.", type:"story" },
+  { tick: 57, msg: "Pipeline 3 erreicht Peak‑Stabilität.", type:"story" },
+  { tick: 58, msg: "Pipeline 6 fällt auf 29% Effizienz.", type:"story" },
+  { tick: 59, msg: "⚡ TOR! → Tore = 3.", type:"event" },
+  { tick: 60, msg: "Pipeline 3 dominiert klar.", type:"story" },
+  { tick: 61, msg: "Pipeline 6 überhitzt → 78%.", type:"story" },
+  { tick: 62, msg: "Pipeline 3 → 48%.", type:"story" },
+  { tick: 63, msg: "Dashboard: A=9, B=8, Hits=8.", type:"story" },
+  { tick: 64, msg: "UNI.spier DRIN → stabil.", type:"story" },
+  { tick: 65, msg: "Pipeline 6 Fehlerquote → 34%.", type:"story" },
+  { tick: 66, msg: "Pipeline 3 setzt Zyklus‑Schritt 8.", type:"story" },
+  { tick: 67, msg: "Slienergie +6 → 54%.", type:"event" },
+  { tick: 68, msg: "Pipeline 6 verliert Kontrolle.", type:"story" },
+  { tick: 69, msg: "Dashboard: A=10, B=9, Hits=9.", type:"story" },
+  { tick: 70, msg: "🏆 Punkt! → Punkte = 3.", type:"event" },
+  { tick: 71, msg: "Pipeline 6 fällt auf 25%.", type:"story" },
+  { tick: 72, msg: "Pipeline 3 → 58%.", type:"story" },
+  { tick: 73, msg: "Ghost‑L2 scannt → alles stabil.", type:"story" },
+  { tick: 74, msg: "Pipeline 6 bricht ein.", type:"story" },
+  { tick: 75, msg: "RUN 3 übernimmt komplett.", type:"story" },
+  { tick: 76, msg: "Pipeline 6 → 22% Effizienz.", type:"story" },
+  { tick: 77, msg: "Pipeline 3 → 62%.", type:"story" },
+  { tick: 78, msg: "Dashboard: A=11, B=10, Hits=10.", type:"story" },
+  { tick: 79, msg: "⚡ TOR! → Tore = 4.", type:"event" },
+  { tick: 80, msg: "Pipeline 6 Fehlerquote → 37%.", type:"story" },
+  { tick: 81, msg: "Pipeline 3 setzt Zyklus‑Schritt 3.", type:"story" },
+  { tick: 82, msg: "Slienergie Pipeline 3 → 68%.", type:"story" },
+  { tick: 83, msg: "Pipeline 6 → 19%.", type:"story" },
+  { tick: 84, msg: "Dashboard: A=12, B=11, Hits=11.", type:"story" },
+  { tick: 85, msg: "Pipeline 3 bleibt präzise.", type:"story" },
+  { tick: 86, msg: "Pipeline 6 → 17%.", type:"story" },
+  { tick: 87, msg: "🏆 Punkt! → Punkte = 4.", type:"event" },
+  { tick: 88, msg: "Pipeline 3 → 72%.", type:"story" },
+  { tick: 89, msg: "Pipeline 6 → 15%.", type:"story" },
+  { tick: 90, msg: "🏁 Spielende – RUN 3 gewinnt klar.", type:"event" }
+];
+
+function run3Simulation() {
+  if (run3Running) return;
+  run3Running = true; run3Tick = 0; engineTick = 0;
+  document.getElementById('consoleLog').innerHTML = '';
+  resetEnergy();
+  if (run3Timer) clearInterval(run3Timer);
+  run3Timer = setInterval(() => {
+    if (run3Tick > 90) { clearInterval(run3Timer); run3Running = false; document.getElementById('btnRun3').textContent = '▶ RUN3'; return; }
+    const entry = run3Story.find(e => e.tick === run3Tick);
+    if (entry) {
+      engine.log(entry.msg, entry.type);
+      if (entry.msg.includes('Slienergie')) { const num = parseInt(entry.msg.match(/\d+/)?.[0] || '0'); if (!isNaN(num) && num > 0) addEnergy(num/10); }
+      if (entry.msg.includes('TOR')) { tor(); renderSaisonUI(); }
+      if (entry.msg.includes('Punkt')) { punkt(); renderSaisonUI(); }
+      if (entry.msg.includes('Dashboard')) { const rand = Math.floor(Math.random() * 100); renderMatrix(rand); }
+      if (run3Tick % 3 === 0) addEnergy(3);
     }
-    setInterval(updateClock, 1000);
+    run3Tick++; engineTick++;
+    document.getElementById('btnRun3').textContent = `RUN3 (${run3Tick}/90)`;
     updateClock();
+  }, 400);
+}
+function stopRun3() { if (run3Timer) clearInterval(run3Timer); run3Running = false; document.getElementById('btnRun3').textContent = '▶ RUN3'; }
 
-    // ---- 7. Start ----
-    document.addEventListener('DOMContentLoaded', function() {
-      setTimeout(initEngines, 300);
-    });
-    if (document.readyState === 'complete' || document.readyState === 'interactive') {
-      setTimeout(initEngines, 300);
-    }
+// ================================================================
+// 8. START – DOMContentLoaded
+// ================================================================
+document.addEventListener('DOMContentLoaded', () => {
+  resizeCanvases();
+  window.addEventListener('resize', resizeCanvases);
+  initBoard(); renderBoard();
+  if (allGames.length) loadGame(allGames[0]);
+  atmo.setMood('anime'); atmo.start();
+  engine.init(); window.engine = engine;
+  updateEnergyUI();
+  renderMatrix(0);
+  renderSaisonUI();
+  updateFootballResults();
+  updateClock();
 
-    // ---- 8. Tastatur ----
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && document.activeElement === document.getElementById('attackInput')) {
-        window.sendAttack();
-        e.preventDefault();
-      }
-      if (e.key === ' ' && e.target === document.body) {
-        e.preventDefault();
-        window.toggleAuto();
-      }
-    });
+  // Buttons
+  document.getElementById('btnGeneral').addEventListener('click', ()=>engine.runGeneral());
+  document.getElementById('btnReset').addEventListener('click', ()=>engine.resetAll());
+  document.getElementById('btnToggleAll').addEventListener('click', ()=>engine.toggleAll());
+  document.getElementById('btnRandom').addEventListener('click', ()=>engine.randomize());
+  document.getElementById('btnPump').addEventListener('click', ()=>engine.pumpCycle());
+  document.getElementById('btnLoop').addEventListener('click', ()=>engine.loopAll());
 
-    // ---- 9. Speed‑Slider ----
-    document.getElementById('speedSlider').addEventListener('input', function() {
-      if (autoInterval) {
-        clearInterval(autoInterval);
-        autoInterval = null;
-        window.toggleAuto();
-      }
-    });
+  document.getElementById('btnStep').addEventListener('click', playNextMove);
+  document.getElementById('btnAuto').addEventListener('click', () => { if(autoMode){ stopAuto(); return; } if(!currentGame){ if(filtered.length){ currentGame=filtered[0]; loadGame(currentGame); } else return; } autoMode=true; document.getElementById('btnAuto').textContent='⏸ Stop'; playNextMove(); });
+  document.getElementById('btnResetBoard').addEventListener('click', () => { stopAuto(); initBoard(); renderBoard(); });
 
-    logDeutung('🧬 ULMR · Admin‑Pult vollständig geöffnet · 3‑9‑81 Achsen bereit.');
-    logDeutung('💡 Nutze die Steuerung oder gib ZEN‑Befehle ein.');
+  document.getElementById('speedSlider').addEventListener('input', function(){ moveSpeed = parseInt(this.value); document.getElementById('speedDisplay').textContent = moveSpeed+'ms'; });
+  document.getElementById('styleSelect').addEventListener('change', function(){ const moodMap={random:'anime', aggressive:'warm', defensive:'cool', tactical:'neon'}; atmo.setMood(moodMap[this.value] || 'anime'); });
+  document.getElementById('strengthSlider').addEventListener('input', function(){ document.getElementById('strengthDisplay').textContent = this.value; });
 
-  })();
+  document.getElementById('btnGood').addEventListener('click', () => { engine.feedback.good++; engine.state.score += 15; engine.log(`👍 Feedback: gut (${engine.feedback.good})`,'ok'); engine.sync(); });
+  document.getElementById('btnBad').addEventListener('click', () => { engine.feedback.bad++; engine.state.score = Math.max(0, engine.state.score - 10); engine.log(`👎 Feedback: schlecht (${engine.feedback.bad})`,'warn'); engine.sync(); });
+  document.getElementById('btnLearn').addEventListener('click', () => { const total = engine.feedback.good + engine.feedback.bad; if(total===0){ engine.log('🧬 Lernen · noch kein Feedback vorhanden','warn'); return; } const ratio = engine.feedback.good / total; const strengthEl = document.getElementById('strengthSlider'); const newStrength = Math.min(5, Math.max(1, Math.round(1 + ratio * 4))); strengthEl.value = newStrength; document.getElementById('strengthDisplay').textContent = newStrength; const styleEl = document.getElementById('styleSelect'); styleEl.value = ratio >= 0.5 ? 'tactical' : 'defensive'; engine.log(`🧬 Lernen · Trefferquote ${Math.round(ratio*100)}% → Stärke ${newStrength}, Stil ${styleEl.value}`,'ok'); engine.feedback = { good:0, bad:0 }; engine.sync(); });
+
+  const effects = { btnIce:{type:'ice', msg:'❄️ ICE · kühle Präzision'}, btnWater:{type:'water', msg:'💧 WATER · fließende Bewegung'}, btnFire:{type:'fire', msg:'🔥 FIRE · brennender Impuls'} };
+  for (const [id, data] of Object.entries(effects)) {
+    document.getElementById(id).addEventListener('click', () => { const rect = canvas.getBoundingClientRect(); spawnEffect(rect.left+rect.width/2, rect.top+rect.height/2, data.type); engine.log(data.msg, 'event'); });
+  }
+
+  // RUN3 – nur EIN Listener (Toggle)
+  document.getElementById('btnRun3').addEventListener('click', function() { if (run3Running) stopRun3(); else run3Simulation(); });
+
+  document.getElementById('btnNextSpieltag').addEventListener('click', () => { const res = nextSpieltag(); renderSaisonUI(); engine.log(`⚽ Spieltag ${res.tag} → ${res.ergebnis}`,'event'); });
+  document.getElementById('btnTor').addEventListener('click', () => { tor(); renderSaisonUI(); engine.log('⚡ TOR!','event'); });
+  document.getElementById('btnPunkt').addEventListener('click', () => { punkt(); renderSaisonUI(); engine.log('🏆 Punkt!','event'); });
+  document.getElementById('btnResetSaison').addEventListener('click', () => { resetSaison(); renderSaisonUI(); engine.log('⟲ Saison zurückgesetzt.','warn'); });
+
+  document.getElementById('btnCalcMatrix').addEventListener('click', () => { const input = parseInt(document.getElementById('goalsInput').value) + parseInt(document.getElementById('shotsInput').value) + parseInt(document.getElementById('possessionInput').value) + parseInt(document.getElementById('foulsInput').value); renderMatrix(input); engine.log(`📐 Matrix berechnet mit Eingabe ${input}`,'ok'); });
+  document.getElementById('btnRandomMatrix').addEventListener('click', () => { const rand = Math.floor(Math.random() * 100); renderMatrix(rand); engine.log(`🎲 Matrix random mit Eingabe ${rand}`,'ok'); });
+
+  document.getElementById('btnCalcFootball').addEventListener('click', updateFootballResults);
+  document.getElementById('btnResetFootball').addEventListener('click', resetFootball);
+  document.querySelectorAll('.football-input input').forEach(input => { input.addEventListener('input', updateFootballResults); });
+
+  document.getElementById('btnAddEnergy').addEventListener('click', () => { addEnergy(6); engine.log('⚡ Energie +6','event'); });
+  document.getElementById('btnResetEnergy').addEventListener('click', () => { resetEnergy(); engine.log('⟲ Energie zurückgesetzt.','warn'); });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === ' ' || e.key === 'ArrowRight') { e.preventDefault(); playNextMove(); }
+    if (e.key === 'r' || e.key === 'R') document.getElementById('btnResetBoard').click();
+    if (e.key === 'a' || e.key === 'A') document.getElementById('btnAuto').click();
+    if (e.key === 'g' || e.key === 'G') document.getElementById('btnGeneral').click();
+    if (e.key === '3') { e.preventDefault(); document.getElementById('btnRun3').click(); }
+  });
+
+  console.log('🧠 IKI1UC · 3 Axiome · Ursache · Wirkung · Kreislauf geladen');
+  console.log('⌨️  Leertaste=Nächster Zug  r=Reset  a=Auto  g=General Run  3=RUN3');
+});
 </script>
-
 </body>
 </html>
