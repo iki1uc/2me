@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>ULRM-D · Rechts</title>
+<style>
+body{
+  background:#000;
+  color:#0f0;
+  font-family:monospace;
+  padding:20px;
+}
+pre{
+  background:#111;
+  padding:20px;
+  border:1px solid #333;
+  white-space:pre-wrap;
+}
+h2{
+  color:#6cf;
+}
+</style>
+</head>
+
+<body>
+
+<h2>ULRM-D · Rechts</h2>
+
+<pre>
+ID: ULRM-D
+ROLE: right
+
+DATA:
+  axis: y
+  step: +1
+  effect: "LAGE.y = LAGE.y + 1"
+  modi: "D"
+
+ENGINE:
+  function ULRM_D(LAGE){
+      return {
+          x: LAGE.x,
+          y: LAGE.y + 1,
+          z: LAGE.z,
+          modi: "D",
+          role: "right"
+      };
+  }
+
+RESULT:
+  LAGE bewegt sich nach rechts (y + 1).
+</pre>
+
+</body>
+</html>
