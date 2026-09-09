@@ -1,211 +1,72 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📐 AXIOM · Engine</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background: #0b0d11;
-      color: #c8d6e5;
-      font-family: 'Consolas', monospace;
-      padding: 30px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .container {
-      max-width: 1100px;
-      width: 100%;
-    }
-    h1 {
-      color: #6cf;
-      font-size: 2rem;
-      text-shadow: 0 0 20px #3a6f9f88;
-      margin-bottom: 6px;
-    }
-    .sub {
-      color: #7a9bb5;
-      margin-bottom: 30px;
-      border-left: 3px solid #6cf;
-      padding-left: 15px;
-    }
-    .panel {
-      background: #11161e;
-      border: 1px solid #2a3f4f;
-      border-radius: 12px;
-      padding: 22px 28px;
-      margin-bottom: 24px;
-    }
-    .panel h2 {
-      color: #9ac7e0;
-      font-size: 1.2rem;
-      margin-bottom: 12px;
-    }
-    .grid-3 {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-    }
-    .card {
-      background: #0c131c;
-      border-radius: 8px;
-      padding: 16px;
-      border-left: 4px solid #3a6f9f;
-    }
-    .card .label {
-      font-size: 0.7rem;
-      color: #6a8fa0;
-      text-transform: uppercase;
-    }
-    .card .value {
-      font-size: 1.4rem;
-      font-weight: bold;
-      margin-top: 4px;
-    }
-    .btn {
-      background: #1c2a36;
-      border: 1px solid #3a5a6a;
-      color: #e0f0fa;
-      padding: 8px 20px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-family: inherit;
-      font-size: 0.9rem;
-      transition: all 0.2s;
-      margin: 4px 8px 4px 0;
-    }
-    .btn:hover {
-      background: #2a4050;
-      border-color: #6cf;
-      box-shadow: 0 0 15px #2a6f9f55;
-    }
-    .btn-gold {
-      background: #b8860b;
-      border-color: #ffb347;
-      color: #fff;
-    }
-    .btn-gold:hover {
-      background: #d4a017;
-      box-shadow: 0 0 20px #ffb34788;
-    }
-    .log-box {
-      background: #0a1018;
-      border-radius: 6px;
-      padding: 10px 14px;
-      max-height: 150px;
-      overflow-y: auto;
-      font-size: 0.75rem;
-      color: #9ab0c0;
-      border: 1px solid #1a2a36;
-      margin-top: 10px;
-      white-space: pre-wrap;
-    }
-    .log-entry {
-      border-bottom: 1px solid #1a222a;
-      padding: 3px 0;
-    }
-    .log-info { color: #6cf; }
-    .log-success { color: #6fdb6f; }
-    .log-warning { color: #f0c060; }
-    .log-error { color: #e06050; }
-    @media (max-width: 700px) {
-      .grid-3 { grid-template-columns: 1fr; }
-    }
-  </style>
+<meta charset="UTF-8">
+<title>NC · MOVE · PICASSO</title>
+
+<style>
+body { background:#000; color:#0f0; font-family:Consolas; padding:40px; }
+pre { background:#111; padding:20px; border-left:3px solid #6cf; }
+h1 { color:#6cf; }
+</style>
 </head>
+
 <body>
-<div class="container">
-  <h1>📐 AXIOM · Engine</h1>
-  <div class="sub">Axiom‑Map · Koordinaten · Resolver · Dreieck · Vektoren</div>
 
-  <div class="panel">
-    <h2>🧩 Axiom‑Dashboard</h2>
-    <div class="grid-3" id="axiomGrid">
-      <div class="card"><div class="label">Axiom</div><div class="value" id="axiom">—</div></div>
-      <div class="card"><div class="label">Koordinate</div><div class="value" id="coord">—</div></div>
-      <div class="card"><div class="label">Resolver</div><div class="value" id="resolver">—</div></div>
-    </div>
-  </div>
+<h1>NC · MOVE · PICASSO</h1>
+<pre id="out">Lade NC‑MOVE…</pre>
 
-  <div class="panel">
-    <h2>🔄 Steuerung</h2>
-    <button class="btn" id="btnRefresh">🔄 Axiom aktualisieren</button>
-    <button class="btn btn-gold" id="btnReport">📡 Report senden</button>
-  </div>
+<script>
+// ============================================================
+// 1. UFO-KERN (9^9)
+// ============================================================
+const UFO = Math.pow(9, 9);
 
-  <div class="panel">
-    <h2>📝 Log</h2>
-    <div class="log-box" id="logBox"></div>
-  </div>
-</div>
+// ============================================================
+// 2. ENERGIE-BLOCK (Picasso-Algorithmus)
+// ============================================================
+const BLOCKS = {
+    HOME: 90,
+    TRANS: 90,
+    WARB: 90,
+    KANAL: 90,
+    CONT: 180
+};
 
-<script type="module">
-  import { report, autoReport, getGlobalStatus, onUpdate } from './respo-master.js';
+// Gesamtenergie
+const TOTAL = Object.values(BLOCKS).reduce((a,b)=>a+b,0);
 
-  const state = {
-    axiom: '—',
-    coord: '—',
-    resolver: '—',
-  };
+// Energie pro Achse (8 Achsen)
+const PER_AXIS = TOTAL / 8;
 
-  const $ = id => document.getElementById(id);
+// ============================================================
+// 3. RUN8 Achsen
+// ============================================================
+const RUN8 = ["N","S","E","W","UP","DOWN","IN","OUT"];
 
-  function log(msg, type = 'info') {
-    const box = $('logBox');
-    const entry = document.createElement('div');
-    entry.className = 'log-entry';
-    const time = new Date().toLocaleTimeString();
-    const icon = { info: 'ℹ️', success: '✅', warning: '⚠️', error: '❌' }[type] || '📌';
-    entry.innerHTML = `<span class="log-${type}">[${time}] ${icon} ${msg}</span>`;
-    box.appendChild(entry);
-    box.scrollTop = box.scrollHeight;
-  }
+// ============================================================
+// 4. Picasso-Vektor-Algorithmus
+// ============================================================
+// Jede Achse bekommt:
+// - Energiefraktal
+// - Picasso-Vektor
+// - NC-MOVE Tunnel
+// - Kontinuum-String
+// - Fraktale Farbe (ASCII)
+// ============================================================
 
-  function updateAxiom() {
-    const axioms = ['A1', 'A2', 'A3', 'A4'];
-    state.axiom = axioms[Math.floor(Math.random() * axioms.length)];
-    state.coord = `(${Math.floor(Math.random()*10)}, ${Math.floor(Math.random()*10)})`;
-    state.resolver = Math.random() < 0.5 ? '✅ gelöst' : '⏳ offen';
-    updateUI();
-    log(`📐 Axiom aktualisiert: ${state.axiom} bei ${state.coord}`, 'info');
-  }
-
-  function updateUI() {
-    $('axiom').textContent = state.axiom;
-    $('coord').textContent = state.coord;
-    $('resolver').textContent = state.resolver;
-    $('resolver').style.color = state.resolver.includes('gelöst') ? '#6fdb6f' : '#f0c060';
-  }
-
-  function getAxiomPayload() {
-    return {
-      axiom: state.axiom,
-      coord: state.coord,
-      resolver: state.resolver,
-      timestamp: Date.now(),
+function picassoColor(axis) {
+    const map = {
+        N: "#0f0",
+        S: "#6cf",
+        E: "#f0f",
+        W: "#ff0",
+        UP: "#0ff",
+        DOWN: "#f60",
+        IN: "#f00",
+        OUT: "#fff"
     };
-  }
+    return map[axis] || "#0f0";
+}
 
-  autoReport('AXIOM', getAxiomPayload, 5000);
-
-  $('btnRefresh').addEventListener('click', updateAxiom);
-  $('btnReport').addEventListener('click', () => {
-    report('AXIOM', getAxiomPayload());
-    log('📡 Report gesendet', 'success');
-  });
-
-  onUpdate((data) => {
-    if (data.name === 'FOUNDER') {
-      log(`👑 Founder-Status: ${data.payload.running ? 'läuft' : 'gestoppt'}`, 'info');
-    } else if (data.name === 'NC_MOVE') {
-      log(`🌀 MOVE-Energie: ${data.payload.totalEnergy || '?'}`, 'info');
-    }
-  });
-
-  updateAxiom();
-  log('📐 AXIOM-Modul gestartet', 'success');
-</script>
-</body>
-</html>
+function fractalEnergy(base) {
