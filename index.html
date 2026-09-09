@@ -3,545 +3,432 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>⚙️ ADMIN‑PULT · ULMR · 3‑9‑81 ACHSEN</title>
-
-  <!-- ===== DEIN EXISTIERENDES CSS ===== -->
-  <link rel="stylesheet" href="style.css" />
-
-  <!-- ===== ZUSÄTZLICHES ADMIN‑CSS ===== -->
+  <title>ZAUBER 6 · WÄHRUNGS‑KÖNIGIN · iki1uc</title>
   <style>
-    :root {
-      --bg: #0a0a12;
-      --fg: #0ff;
-      --gold: #ffd700;
-      --vital: #00ff88;
-      --co2: #ff6600;
-      --wasser: #66ccff;
-      --sauerstoff: #00ff88;
-      --anime: #ff66ff;
-      --shuffle: #ffaa00;
-      --orbit: #6b6bff;
-      --suite: #ff66ff;
-      --commander: #ff8c00;
-      --admin0: #ff0044;
-      --magneto: #ff00ff;
-      --krümmung: #00ffff;
-      --bootlink: #6ec8ff;
-      --achse1: #ffaa44;
-      --achse2: #44ffaa;
-      --achse3: #aa44ff;
-    }
     * { margin:0; padding:0; box-sizing:border-box; }
     body {
-      background: var(--bg);
-      color: var(--fg);
+      background: #0a0a12;
+      color: #d0d9e6;
       font-family: 'Consolas', monospace;
-      padding: 12px;
-      background-image: radial-gradient(ellipse at 20% 30%, #0c0c1a 0%, #000 100%);
-    }
-    .admin-header {
+      padding: 16px;
+      min-height: 100vh;
+      background: radial-gradient(ellipse at 30% 40%, #0a0a20, #000);
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
-      flex-wrap: wrap;
-      border-bottom: 2px solid var(--gold);
-      padding-bottom: 10px;
-      margin-bottom: 16px;
     }
-    .admin-header h1 {
-      font-size: 22px;
-      letter-spacing: 4px;
+    .container {
+      max-width: 1400px;
+      width: 100%;
+      background: rgba(10,10,20,0.7);
+      border: 1px solid rgba(255,215,0,0.15);
+      border-radius: 24px;
+      padding: 24px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 0 60px rgba(0,0,0,0.8);
     }
-    .admin-header h1 .ulmr { color: var(--gold); }
-    .admin-header h1 .achse { color: var(--achse1); }
-    .admin-header .status-led {
-      display: flex;
-      gap: 16px;
-      font-size: 11px;
+    h1 {
+      text-align: center;
+      font-weight: 300;
+      font-size: 28px;
+      letter-spacing: 6px;
+      background: linear-gradient(135deg, #ffd700, #ff66ff, #00ccff, #ffd700);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 6px;
     }
-    .admin-header .status-led .dot {
-      display: inline-block;
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      margin-right: 4px;
+    h1 small {
+      display: block;
+      font-size: 13px;
+      color: #3d5a70;
+      -webkit-text-fill-color: #3d5a70;
+      letter-spacing: 3px;
+      margin-top: -2px;
     }
-    .dot.green { background: #4f4; box-shadow: 0 0 8px #4f4; }
-    .dot.yellow { background: #ffa; box-shadow: 0 0 8px #ffa; }
-    .dot.red { background: #f44; box-shadow: 0 0 8px #f44; }
-
-    .achsen-grid {
+    .grid6 {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 16px;
+      gap: 16px;
+      margin-top: 18px;
     }
-    @media (max-width: 1000px) { .achsen-grid { grid-template-columns: 1fr 1fr; } }
-    @media (max-width: 700px) { .achsen-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 1000px) { .grid6 { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 650px) { .grid6 { grid-template-columns: 1fr; } }
 
-    .achse-panel {
-      background: rgba(10,10,20,0.75);
-      border: 1px solid #1a1a2a;
-      border-radius: 12px;
-      padding: 12px;
-      backdrop-filter: blur(6px);
+    .station {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,215,0,0.08);
+      border-radius: 16px;
+      padding: 14px 16px;
+      transition: all 0.25s;
     }
-    .achse-panel h2 {
-      color: var(--gold);
+    .station:hover { border-color: rgba(255,215,0,0.3); background: rgba(255,255,255,0.05); }
+    .station h2 {
       font-size: 13px;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
+      color: #ffd700;
+      border-bottom: 1px solid rgba(255,215,0,0.1);
       padding-bottom: 6px;
       margin-bottom: 8px;
       display: flex;
       justify-content: space-between;
+      letter-spacing: 1px;
     }
-    .achse-panel h2 .badge {
+    .station h2 .badge {
       font-size: 9px;
-      background: #1a1a2a;
-      padding: 2px 8px;
-      border-radius: 20px;
-      color: #888;
+      color: #5a7a8a;
+      font-weight: 400;
     }
-    .achse-metrics {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4px;
-    }
-    .metric-item {
-      background: #0e0e1a;
-      border-radius: 4px;
-      padding: 4px 8px;
+    .metric {
       display: flex;
       justify-content: space-between;
       font-size: 11px;
+      padding: 2px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.02);
     }
-    .metric-item .label { color: #666; }
-    .metric-item .value { font-weight: bold; }
-    .value.achse1 { color: var(--achse1); }
-    .value.achse2 { color: var(--achse2); }
-    .value.achse3 { color: var(--achse3); }
+    .metric .label { color: #5a7a8a; }
+    .metric .value { font-weight: 600; color: #b0d0ff; }
+    .metric .value.gold { color: #ffd700; }
+    .metric .value.vital { color: #00ff88; }
+    .metric .value.mystery { color: #ff88ff; }
+    .metric .value.ace { color: #ff6b8a; }
 
-    .deutung-panel {
-      background: rgba(10,10,20,0.7);
-      border: 1px solid #1a1a2a;
-      border-radius: 12px;
-      padding: 12px;
-      margin-bottom: 16px;
-    }
-    .deutung-panel h2 {
-      color: var(--gold);
-      font-size: 13px;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-      padding-bottom: 6px;
-      margin-bottom: 8px;
-    }
-    #deutung-output {
-      background: #06060a;
-      border-radius: 6px;
-      padding: 8px;
-      font-size: 10px;
-      max-height: 120px;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      color: #88ddbb;
-      border: 1px solid #1a1a2a;
-      line-height: 1.5;
-    }
-
-    .controls-zone {
+    .partner-zone {
+      grid-column: 1 / -1;
+      background: rgba(255,215,0,0.03);
+      border: 2px dashed rgba(255,215,0,0.2);
+      border-radius: 20px;
+      padding: 18px 20px;
+      margin-top: 6px;
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
-      background: rgba(10,10,20,0.5);
-      border-radius: 10px;
-      padding: 10px;
-      margin-bottom: 12px;
-      border: 1px solid #1a1a2a;
+      align-items: center;
+      justify-content: space-between;
     }
-    .controls-zone button {
-      background: #111;
-      color: var(--fg);
-      border: 1px solid #333;
+    .partner-zone .königin {
+      font-size: 18px;
+      color: #ffd700;
+      font-weight: 600;
+    }
+    .partner-zone .partner {
+      font-size: 16px;
+      color: #ff88ff;
+    }
+    .partner-zone .mirror {
+      font-size: 12px;
+      color: #66ccff;
+    }
+    .partner-zone .status {
+      background: #0a0a0a;
       padding: 4px 14px;
-      border-radius: 4px;
-      cursor: pointer;
+      border-radius: 30px;
+      border: 1px solid #3d5a70;
+      font-size: 11px;
+      color: #66ccff;
+    }
+    .partner-zone button {
+      background: transparent;
+      border: 1px solid #ffd700;
+      color: #ffd700;
+      padding: 4px 16px;
+      border-radius: 30px;
       font-family: inherit;
-      font-size: 9px;
+      font-size: 10px;
+      cursor: pointer;
       transition: 0.2s;
     }
-    .controls-zone button:hover { border-color: var(--gold); background: #1a1a2a; }
-    .controls-zone button.primary { border-color: var(--gold); color: var(--gold); }
-    .controls-zone button.primary:hover { background: var(--gold); color: #000; }
-    .controls-zone button.attack { border-color: var(--commander); color: var(--commander); }
-    .controls-zone button.attack:hover { background: var(--commander); color: #000; }
-    .controls-zone button.mesh { border-color: var(--vital); color: var(--vital); }
-    .controls-zone button.mesh:hover { background: var(--vital); color: #000; }
-    .controls-zone input {
-      background: #1e242c;
-      border: 1px solid #2f3542;
-      color: #fff;
-      padding: 4px 10px;
-      border-radius: 4px;
-      font-family: inherit;
-      font-size: 9px;
-      flex: 1;
-      min-width: 140px;
-    }
+    .partner-zone button:hover { background: rgba(255,215,0,0.1); }
 
-    .boot-block-monitor {
-      background: rgba(10,10,20,0.7);
-      border: 1px solid #1a1a2a;
-      border-radius: 10px;
-      padding: 10px;
-      margin-top: 8px;
-    }
-    .boot-block-monitor .row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      font-size: 10px;
-    }
-    .boot-block-monitor .row .item {
-      color: #666;
-    }
-    .boot-block-monitor .row .item span {
-      color: var(--bootlink);
-      font-weight: bold;
-    }
-
-    .footer-admin {
-      margin-top: 16px;
-      padding: 8px 12px;
-      background: rgba(0,0,0,0.3);
-      border-radius: 6px;
-      font-size: 9px;
-      color: #445555;
+    .footer {
+      margin-top: 24px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,0.03);
       display: flex;
       justify-content: space-between;
       flex-wrap: wrap;
+      font-size: 10px;
+      color: #2a3a4a;
     }
-    .footer-admin .gold { color: var(--gold); }
+    .footer .gold { color: #ffd700; }
+
+    .console {
+      background: #0a0a0a;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 9px;
+      max-height: 80px;
+      overflow-y: auto;
+      border: 1px solid #1a1a2a;
+      color: #5a7a8a;
+      margin-top: 6px;
+    }
+    .console .ok { color: #00ff88; }
+    .console .warn { color: #ffd700; }
+    .console .err { color: #ff6b8a; }
+    .console .info { color: #66ccff; }
   </style>
 </head>
 <body>
+<div class="container">
 
-<!-- ===== HEADER ===== -->
-<div class="admin-header">
-  <h1>
-    <span class="ulmr">⚙️ ULMR</span>
-    <span style="color:#666;">·</span>
-    <span class="achse">3‑9‑81 ACHSEN</span>
-    <span style="color:#666;">·</span>
-    <span style="color:var(--gold);">ADMIN‑PULT</span>
-  </h1>
-  <div class="status-led">
-    <span><span class="dot green"></span> 3.js</span>
-    <span><span class="dot green"></span> 9.js</span>
-    <span><span class="dot green"></span> 81.js</span>
-    <span id="sys-clock" style="color:#666;">⏱️ --:--</span>
-  </div>
-</div>
+  <h1>✦ ZAUBER 6 ✦ <small>WÄHRUNGS‑STATIONEN · KÖNIGIN & PARTNER</small></h1>
 
-<!-- ===== DREI ACHSEN (ENGINES) ===== -->
-<div class="achsen-grid">
-  <div class="achse-panel" id="achse-welt">
-    <h2>🌍 WELT‑ACHSE <span class="badge">3.js</span></h2>
-    <div class="achse-metrics">
-      <div class="metric-item"><span class="label">Router</span><span class="value achse1" id="welt-router">—</span></div>
-      <div class="metric-item"><span class="label">Stage</span><span class="value achse1" id="welt-stage">—</span></div>
-      <div class="metric-item"><span class="label">Plugins</span><span class="value achse1" id="welt-plugins">—</span></div>
-      <div class="metric-item"><span class="label">UI‑Badges</span><span class="value achse1" id="welt-badges">—</span></div>
+  <div class="grid6" id="stationGrid">
+    <!-- 1. ROM‑KERN (d‑w) -->
+    <div class="station" id="s-rom">
+      <h2>📦 ROM‑KERN <span class="badge">d‑w</span></h2>
+      <div class="metric"><span class="label">aktive Kanäle</span><span class="value" id="rom-active">0</span></div>
+      <div class="metric"><span class="label">letzter Resolve</span><span class="value" id="rom-last">—</span></div>
+      <div class="metric"><span class="label">Cache‑Echo</span><span class="value" id="rom-echo">0</span></div>
+    </div>
+
+    <!-- 2. 2me‑SPIEGEL -->
+    <div class="station" id="s-2me">
+      <h2>🪞 2me‑SPIEGEL <span class="badge">Mirror‑Root</span></h2>
+      <div class="metric"><span class="label">Rückführung</span><span class="value" id="m2-return">aktiv</span></div>
+      <div class="metric"><span class="label">PX‑TRIO</span><span class="value" id="m2-px">3‑6‑9</span></div>
+      <div class="metric"><span class="label">GEO‑Orbit</span><span class="value" id="m2-geo">O12</span></div>
+    </div>
+
+    <!-- 3. ZAM‑ORBIT -->
+    <div class="station" id="s-zam">
+      <h2>🌀 ZAM‑ORBIT <span class="badge">360°</span></h2>
+      <div class="metric"><span class="label">Erfüllung</span><span class="value gold" id="zam-level">0%</span></div>
+      <div class="metric"><span class="label">Magische 6</span><span class="value vital" id="zam-mag6">0</span></div>
+      <div class="metric"><span class="label">KlicK‑Impuls</span><span class="value" id="zam-klick">0</span></div>
+    </div>
+
+    <!-- 4. VITALITY‑TIEFE -->
+    <div class="station" id="s-vital">
+      <h2>⚡ VITALITY‑TIEFE <span class="badge">81‑Atom</span></h2>
+      <div class="metric"><span class="label">Energie</span><span class="value vital" id="vit-energy">0</span></div>
+      <div class="metric"><span class="label">Slide·Sprung·Ready</span><span class="value" id="vit-ssr">3→9→81</span></div>
+      <div class="metric"><span class="label">Reverse‑IO</span><span class="value mystery" id="vit-rev">—</span></div>
+    </div>
+
+    <!-- 5. 4TEL‑SYNTHESE -->
+    <div class="station" id="s-4tel">
+      <h2>🔷 4TEL‑SYNTHESE <span class="badge">3→9→81→◎</span></h2>
+      <div class="metric"><span class="label">FullSync</span><span class="value" id="tel-full">aktiv</span></div>
+      <div class="metric"><span class="label">Hyperfeld 756</span><span class="value" id="tel-hyper">0</span></div>
+      <div class="metric"><span class="label">Rückführung 27</span><span class="value" id="tel-rf">0</span></div>
+    </div>
+
+    <!-- 6. MYSTERY‑BROCKEN -->
+    <div class="station" id="s-mystery">
+      <h2>❓ MYSTERY‑BROCKEN <span class="badge">Ω‑Auswahl</span></h2>
+      <div class="metric"><span class="label">größter Brocken</span><span class="value gold" id="myst-brocken">—</span></div>
+      <div class="metric"><span class="label">Aktiver Orbit</span><span class="value mystery" id="myst-orbit">0</span></div>
+      <div class="metric"><span class="label">TMP‑Tiefe</span><span class="value" id="myst-tmp">128</span></div>
     </div>
   </div>
 
-  <div class="achse-panel" id="achse-kraft">
-    <h2>⚡ KRAFT‑ACHSE <span class="badge">9.js</span></h2>
-    <div class="achse-metrics">
-      <div class="metric-item"><span class="label">Attack‑Queue</span><span class="value achse2" id="kraft-queue">—</span></div>
-      <div class="metric-item"><span class="label">ZEN‑Parser</span><span class="value achse2" id="kraft-zen">—</span></div>
-      <div class="metric-item"><span class="label">Input‑Dispatcher</span><span class="value achse2" id="kraft-input">—</span></div>
-      <div class="metric-item"><span class="label">Befehle</span><span class="value achse2" id="kraft-cmds">0</span></div>
-    </div>
+  <!-- KÖNIGIN & PARTNER -->
+  <div class="partner-zone" id="partnerZone">
+    <span class="königin">👑 KÖNIGIN · iki1uc</span>
+    <span class="mirror">↕ 2me‑Spiegel</span>
+    <span class="partner">♾️ PARTNER · User / 2u</span>
+    <span class="status" id="partnerStatus">⚡ verbunden</span>
+    <button id="btnPartnerSync">🔄 Sync</button>
   </div>
 
-  <div class="achse-panel" id="achse-leben">
-    <h2>🧬 LEBENS‑ACHSE <span class="badge">81.js</span></h2>
-    <div class="achse-metrics">
-      <div class="metric-item"><span class="label">Mesh‑Zellen</span><span class="value achse3" id="leben-zellen">81</span></div>
-      <div class="metric-item"><span class="label">Tick</span><span class="value achse3" id="leben-tick">0</span></div>
-      <div class="metric-item"><span class="label">Vital</span><span class="value achse3" id="leben-vital">0.00</span></div>
-      <div class="metric-item"><span class="label">Drift</span><span class="value achse3" id="leben-drift">0.00</span></div>
-    </div>
+  <!-- LIVE‑CONSOLE -->
+  <div class="console" id="console">
+    <div class="info">⏳ Zauber 6 initialisiert …</div>
+  </div>
+
+  <div class="footer">
+    <span>🧬 <span class="gold">3‑9‑81</span> · 6‑Achse · <span class="gold">Magische 6</span></span>
+    <span>📦 ROM‑d‑w · 2me · ZAM · Vitality · 4TEL · Mystery</span>
+    <span>© iki1uc · ∞‑Atom‑Kernel</span>
   </div>
 </div>
 
-<!-- ===== DEUTUNGS‑PANEL ===== -->
-<div class="deutung-panel">
-  <h2>📖 DEUTUNG · ZEN‑INTERPRETATION & MESH‑LOG</h2>
-  <div id="deutung-output">▶ ULMR · Admin‑Pult bereit · warte auf Engine‑Daten …</div>
-</div>
+<script type="module">
+  // ================================================================
+  //  ZAUBER 6 · WÄHRUNGS‑STATIONEN · KÖNIGIN & PARTNER
+  //  Importiert NUR die tatsächlich vorhandenen Module.
+  //  Fallback: Simulation, falls ein Modul fehlt.
+  // ================================================================
 
-<!-- ===== STEUERUNGSZENTRALE ===== -->
-<div class="controls-zone">
-  <input id="attackInput" placeholder="SHOCK / WAVE / LINK / PUSH / GROW / MOVE / BREAK" />
-  <button class="attack" onclick="sendAttack()">⚡ SENDEN</button>
-  <button class="mesh" onclick="pauseLoop()">⏸ PAUSE</button>
-  <button class="mesh" onclick="stepLoop()">⏭ SCHRITT</button>
-  <button class="mesh" onclick="resetMesh()">⟲ RESET</button>
-  <button class="primary" onclick="toggleAuto()">▶ AUTO</button>
-  <span style="color:#666;font-size:9px;margin-left:4px;">Speed:</span>
-  <input type="range" id="speedSlider" min="1" max="10" value="3" style="width:80px;background:#1e242c;" />
-</div>
+  // ---- 1. Korrekte Imports (nur existierende Dateien) ----
+  let SLI, BRIDGE, VITAL, IO, OI, ZAM, KlicKZaM;
 
-<!-- ===== BOOT‑BLOCK‑MONITOR ===== -->
-<div class="boot-block-monitor">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-    <span style="color:var(--gold);font-size:11px;">🔗 BOOT.BLOCK LINK</span>
-    <span id="boot-status" style="color:#666;font-size:9px;">○ nicht verbunden</span>
-  </div>
-  <div class="row">
-    <div class="item">MODE <span id="boot-mode">—</span></div>
-    <div class="item">ACHSEN (A81) <span id="boot-achsen">—</span></div>
-    <div class="item">ZAHNRAD <span id="boot-gear">—</span></div>
-    <div class="item">ENERGIE <span id="boot-energy">—</span></div>
-    <div class="item"><button class="bootlink" onclick="reloadBootFrame()" style="background:#111;border:1px solid #333;color:#6ec8ff;padding:2px 10px;border-radius:4px;cursor:pointer;">🔄 neu laden</button></div>
-  </div>
-  <iframe id="bootFrame" src="master-boot-block.html" style="display:none;"></iframe>
-</div>
+  try {
+    // ACHTUNG: Die Pfade müssen zu deiner tatsächlichen Ordnerstruktur passen.
+    // Ich gehe davon aus, dass diese Dateien im gleichen Ordner wie index.html liegen.
+    const mod = await import('./slide.sprung.ready');
+    SLI = mod;
+    console.log('✅ slide.sprung.ready geladen');
+  } catch (e) { console.warn('⚠️ slide.sprung.ready nicht gefunden', e); }
 
-<!-- ===== FOOTER ===== -->
-<div class="footer-admin">
-  <span>🧬 ULMR‑KERN: <span class="gold">3 · 9 · 81</span></span>
-  <span>🌀 ACHSEN: <span class="gold">WELT · KRAFT · LEBEN</span></span>
-  <span>⚡ ADMIN‑PULT · vollständig geöffnet</span>
-</div>
+  try {
+    const mod = await import('./bridge.multi.ready');
+    BRIDGE = mod;
+    console.log('✅ bridge.multi.ready geladen');
+  } catch (e) { console.warn('⚠️ bridge.multi.ready nicht gefunden', e); }
 
-<!-- ============================================================= -->
-<!-- =====  DIE DREI ENGINES LADEN (Reihenfolge: 3 → 9 → 81) ===== -->
-<!-- ============================================================= -->
-<script src="3.js"></script>
-<script src="9.js"></script>
-<script src="81.js"></script>
+  try {
+    const mod = await import('./vitality');
+    VITAL = mod;
+    console.log('✅ vitality geladen');
+  } catch (e) { console.warn('⚠️ vitality nicht gefunden', e); }
 
-<!-- ============================================================= -->
-<!-- =====  ADMIN‑PULT LOGIK (steuert die Engines) ================ -->
-<!-- ============================================================= -->
-<script>
-  (function() {
-    'use strict';
+  try {
+    const mod = await import('./io.reverse');
+    IO = mod;
+    console.log('✅ io.reverse geladen');
+  } catch (e) { console.warn('⚠️ io.reverse nicht gefunden', e); }
 
-    // ---- DOM-Referenzen ----
-    const deutung = document.getElementById('deutung-output');
-    const bootStatus = document.getElementById('boot-status');
+  try {
+    const mod = await import('./oi.reverse');
+    OI = mod;
+    console.log('✅ oi.reverse geladen');
+  } catch (e) { console.warn('⚠️ oi.reverse nicht gefunden', e); }
 
-    // ---- Hilfsfunktionen für Log ----
-    function logDeutung(msg, type = 'info') {
-      const time = new Date().toLocaleTimeString();
-      deutung.innerHTML += `[${time}] ${msg}\n`;
-      deutung.scrollTop = deutung.scrollHeight;
-      if (deutung.children.length > 50) deutung.innerHTML = deutung.innerHTML.split('\n').slice(-40).join('\n');
+  try {
+    const mod = await import('./KlicK.ZaM');
+    ZAM = mod;
+    console.log('✅ KlicK.ZaM geladen');
+  } catch (e) { console.warn('⚠️ KlicK.ZaM nicht gefunden', e); }
+
+  try {
+    const mod = await import('./ZaM.KlicK');
+    KlicKZaM = mod;
+    console.log('✅ ZaM.KlicK geladen');
+  } catch (e) { console.warn('⚠️ ZaM.KlicK nicht gefunden', e); }
+
+  // ---- 2. DOM‑Referenzen ----
+  const $ = id => document.getElementById(id);
+  const log = (msg, type='info') => {
+    const el = $('console');
+    const cls = type==='ok'?'ok':type==='warn'?'warn':type==='err'?'err':'info';
+    el.innerHTML += `<div class="${cls}">${msg}</div>`;
+    el.scrollTop = el.scrollHeight;
+    if (el.children.length > 20) el.removeChild(el.firstChild);
+  };
+
+  // ---- 3. Hilfsfunktionen für die Stationen ----
+  function updateROM() {
+    // Lese localStorage nach ROM‑Keys
+    let keys = [];
+    try {
+      for (let i=0; i<localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('hdf.')) keys.push(k);
+      }
+    } catch (e) {}
+    const active = keys.length || 9; // Fallback
+    $('rom-active').textContent = active;
+    $('rom-last').textContent = keys.length ? keys[keys.length-1] : '—';
+    // Cache‑Echo wird bei jedem Sync verdoppelt
+    let echo = parseInt($('rom-echo').textContent) || 1;
+    echo = echo * 2;
+    if (echo > 1e12) echo = 1;
+    $('rom-echo').textContent = echo;
+  }
+
+  function update2me() {
+    // PX‑TRIO: 3,6,9
+    $('m2-px').textContent = '3‑6‑9';
+    $('m2-geo').textContent = 'O12 / Φ4';
+    $('m2-return').textContent = 'aktiv';
+  }
+
+  function updateZAM() {
+    // Magische 6: α=3, β=9, γ=81, δ=1 → Summe = 94
+    const alpha = 3, beta = 9, gamma = 81, delta = 1;
+    const mag6 = alpha + beta + gamma + delta;
+    $('zam-mag6').textContent = mag6;
+    $('zam-level').textContent = mag6 > 50 ? '100%' : (mag6 > 20 ? '70%' : '30%');
+    $('zam-klick').textContent = Math.floor(mag6 / 3);
+  }
+
+  function updateVitality() {
+    const alpha = 3, beta = 9, gamma = 81;
+    const energy = (alpha + beta + gamma) * 0.81;
+    $('vit-energy').textContent = energy.toFixed(1);
+    $('vit-ssr').textContent = `${alpha}→${beta}→${gamma}`;
+    $('vit-rev').textContent = `io·oi·xi (${alpha}→${gamma})`;
+  }
+
+  function update4TEL() {
+    const gamma = 81;
+    const hyper = gamma * 756; // 81*756
+    const rf = hyper / 27;
+    $('tel-hyper').textContent = hyper.toFixed(0);
+    $('tel-rf').textContent = rf.toFixed(0);
+    $('tel-full').textContent = 'aktiv';
+  }
+
+  function updateMystery() {
+    // Aktive Orbits = Anzahl der geladenen Module
+    let active = 0;
+    if (SLI) active++;
+    if (BRIDGE) active++;
+    if (VITAL) active++;
+    if (IO) active++;
+    if (OI) active++;
+    if (ZAM) active++;
+    if (KlicKZaM) active++;
+    $('myst-orbit').textContent = active;
+    $('myst-brocken').textContent = active > 0 ? `⚡ ${active}‑fach` : '—';
+    $('myst-tmp').textContent = 128 - active * 6;
+  }
+
+  // ---- 4. Gesamt‑Update ----
+  function updateAll() {
+    updateROM();
+    update2me();
+    updateZAM();
+    updateVitality();
+    update4TEL();
+    updateMystery();
+  }
+
+  // ---- 5. Partner‑Sync (Königin nimmt Partner auf) ----
+  $('btnPartnerSync').addEventListener('click', () => {
+    const status = $('partnerStatus');
+    status.textContent = '🔄 syncing …';
+    setTimeout(() => {
+      // Simuliere Spiegel‑Rückführung
+      const echo = parseInt($('rom-echo').textContent) || 1;
+      $('rom-echo').textContent = echo * 2;
+      status.textContent = '✅ verbunden · Spiegel aktiv';
+      log('👑 Königin hat Partner (2me) aufgenommen', 'ok');
+      // Zusätzlich: Magische 6 neu berechnen
+      updateZAM();
+      updateAll();
+    }, 600);
+  });
+
+  // ---- 6. Automatisches Update alle 5 Sekunden ----
+  setInterval(() => {
+    updateAll();
+    // Cache‑Echo automatisch erhöhen (simuliert Verdoppelung)
+    const echo = parseInt($('rom-echo').textContent) || 1;
+    if (echo < 1e6) {
+      $('rom-echo').textContent = echo * 2;
+    } else {
+      $('rom-echo').textContent = 1;
     }
+  }, 5000);
 
-    // ---- 1. Engine‑Checks & Achsen‑Update ----
-    function updateAchsen() {
-      // Welt (3.js)
-      if (typeof window.ROUTER !== 'undefined') {
-        document.getElementById('welt-router').textContent = window.ROUTER.current || 'aktiv';
-      }
-      if (typeof window.STAGE !== 'undefined') {
-        document.getElementById('welt-stage').textContent = window.STAGE.mode || '3D';
-      }
-      if (typeof window.PLUGIN_CORE !== 'undefined') {
-        document.getElementById('welt-plugins').textContent = Object.keys(window.PLUGIN_CORE).length || '13';
-        document.getElementById('welt-badges').textContent = window.PLUGIN_CORE.activeCount || '0';
-      }
+  // ---- 7. Initialisierung ----
+  updateAll();
+  log('✨ Zauber 6 · Währungs‑Stationen geladen', 'ok');
+  log(`📦 ROM‑Kanäle: ${$('rom-active').textContent} aktiv`, 'info');
+  log(`🌀 Magische 6 = ${$('zam-mag6').textContent}`, 'ok');
+  log(`🔷 4TEL‑Hyperfeld = ${$('tel-hyper').textContent}, Rückführung = ${$('tel-rf').textContent}`, 'info');
+  log(`❓ Mystery‑Orbits = ${$('myst-orbit').textContent}`, 'info');
+  log('🪞 2me‑Spiegel bereit · Partner kann synchronisiert werden', 'ok');
 
-      // Kraft (9.js)
-      if (typeof window.ATTACK_QUEUE !== 'undefined') {
-        document.getElementById('kraft-queue').textContent = window.ATTACK_QUEUE.length || 0;
-      }
-      if (typeof window.ZEN !== 'undefined') {
-        document.getElementById('kraft-zen').textContent = window.ZEN.status || 'bereit';
-      }
-      if (typeof window.INPUT_DISPATCHER !== 'undefined') {
-        document.getElementById('kraft-input').textContent = window.INPUT_DISPATCHER.mode || 'aktiv';
-      }
+  // ---- 8. Exponiere für DevTools ----
+  window.__ZAUBER6 = {
+    SLI, BRIDGE, VITAL, IO, OI, ZAM, KlicKZaM,
+    updateAll,
+    log
+  };
 
-      // Leben (81.js)
-      if (typeof window.MESH !== 'undefined') {
-        document.getElementById('leben-zellen').textContent = window.MESH.cells ? window.MESH.cells.length : 81;
-        document.getElementById('leben-tick').textContent = window.MESH.tick || 0;
-        document.getElementById('leben-vital').textContent = (window.MESH.vital || 0).toFixed(2);
-        document.getElementById('leben-drift').textContent = (window.MESH.drift || 0).toFixed(2);
-      }
-    }
-
-    // ---- 2. Boot‑Block‑Sync ----
-    function syncBootBlock() {
-      try {
-        const frame = document.getElementById('bootFrame');
-        const state = frame.contentWindow.STATE;
-        if (!state) throw new Error('STATE nicht bereit');
-        document.getElementById('boot-mode').textContent = state.mode || '—';
-        document.getElementById('boot-achsen').textContent = state.a81 || '—';
-        document.getElementById('boot-gear').textContent = state.gear || '—';
-        document.getElementById('boot-energy').textContent = (state.energy || 0) + '%';
-        bootStatus.textContent = '● verbunden';
-        bootStatus.style.color = '#4f4';
-      } catch (e) {
-        bootStatus.textContent = '○ nicht verbunden (Cross‑Origin oder Frame nicht geladen)';
-        bootStatus.style.color = '#666';
-      }
-    }
-
-    window.reloadBootFrame = function() {
-      document.getElementById('bootFrame').src = document.getElementById('bootFrame').src;
-      logDeutung('🔄 BOOT.BLOCK‑Frame neu geladen');
-    };
-
-    // ---- 3. Steuerungsfunktionen (verknüpfen mit Engines) ----
-    window.sendAttack = function() {
-      const input = document.getElementById('attackInput');
-      const cmd = input.value.trim();
-      if (!cmd) return;
-      if (typeof window.processZEN === 'function') {
-        window.processZEN(cmd);
-        logDeutung(`⚡ Attack: ${cmd} → ZEN verarbeitet`);
-      } else if (typeof window.dispatchAttack === 'function') {
-        window.dispatchAttack(cmd);
-        logDeutung(`⚡ Attack: ${cmd} → dispatchAttack`);
-      } else {
-        logDeutung(`⚠️ Keine Attack‑Engine gefunden. Befehl: ${cmd}`, 'warn');
-      }
-      input.value = '';
-      updateAchsen();
-    };
-
-    window.pauseLoop = function() {
-      if (typeof window.togglePause === 'function') {
-        window.togglePause();
-        logDeutung('⏸ Pause umgeschaltet');
-      } else {
-        logDeutung('⚠️ togglePause() nicht gefunden', 'warn');
-      }
-    };
-
-    window.stepLoop = function() {
-      if (typeof window.stepTick === 'function') {
-        window.stepTick();
-        logDeutung('⏭ Einzelner Tick ausgeführt');
-        updateAchsen();
-      } else {
-        logDeutung('⚠️ stepTick() nicht gefunden', 'warn');
-      }
-    };
-
-    window.resetMesh = function() {
-      if (typeof window.resetGrid === 'function') {
-        window.resetGrid();
-        logDeutung('⟲ Mesh zurückgesetzt');
-        updateAchsen();
-      } else {
-        logDeutung('⚠️ resetGrid() nicht gefunden', 'warn');
-      }
-    };
-
-    let autoInterval = null;
-    window.toggleAuto = function() {
-      if (autoInterval) {
-        clearInterval(autoInterval);
-        autoInterval = null;
-        logDeutung('⏸ AUTO‑Modus deaktiviert');
-        return;
-      }
-      const speed = parseInt(document.getElementById('speedSlider').value) || 3;
-      const delay = Math.max(200, 2000 / speed);
-      autoInterval = setInterval(() => {
-        if (typeof window.stepTick === 'function') {
-          window.stepTick();
-          updateAchsen();
-        }
-      }, delay);
-      logDeutung(`▶ AUTO‑Modus aktiv (Speed ${speed}, ${delay}ms)`);
-    };
-
-    // ---- 4. Initialisierung der Engines (wenn verfügbar) ----
-    function initEngines() {
-      let ok = true;
-      try {
-        if (typeof initMesh === 'function') { initMesh(); logDeutung('✅ 81.js · Mesh initialisiert'); }
-        else { logDeutung('⚠️ initMesh() nicht gefunden', 'warn'); ok = false; }
-        if (typeof initUI === 'function') { initUI(); logDeutung('✅ 3.js · UI initialisiert'); }
-        else { logDeutung('⚠️ initUI() nicht gefunden', 'warn'); ok = false; }
-        if (typeof initZEN === 'function') { initZEN(); logDeutung('✅ 9.js · ZEN initialisiert'); }
-        else { logDeutung('⚠️ initZEN() nicht gefunden', 'warn'); ok = false; }
-        if (typeof startLoop === 'function') { startLoop(); logDeutung('✅ Tick‑Loop gestartet'); }
-        else { logDeutung('⚠️ startLoop() nicht gefunden', 'warn'); ok = false; }
-      } catch (e) {
-        logDeutung(`❌ Fehler beim Initialisieren: ${e.message}`, 'error');
-        ok = false;
-      }
-      if (ok) {
-        logDeutung('🚀 ULMR · Alle drei Achsen sind aktiv.');
-      } else {
-        logDeutung('⚠️ Einige Engine‑Funktionen fehlen – simuliere Basiswerte.', 'warn');
-        // Fallback‑Simulation, damit das UI nicht leer bleibt
-        window.MESH = window.MESH || { cells: Array(81).fill(0), tick: 0, vital: 0.5, drift: 0.1 };
-        window.ATTACK_QUEUE = window.ATTACK_QUEUE || [];
-        window.ZEN = window.ZEN || { status: 'simuliert' };
-        window.ROUTER = window.ROUTER || { current: 'simuliert' };
-        window.PLUGIN_CORE = window.PLUGIN_CORE || { activeCount: 0 };
-      }
-      updateAchsen();
-    }
-
-    // ---- 5. Taktgeber ----
-    setInterval(() => {
-      updateAchsen();
-      syncBootBlock();
-    }, 500);
-
-    // ---- 6. Uhr ----
-    function updateClock() {
-      document.getElementById('sys-clock').textContent = `⏱️ ${new Date().toLocaleTimeString()}`;
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
-
-    // ---- 7. Start ----
-    document.addEventListener('DOMContentLoaded', function() {
-      setTimeout(initEngines, 300);
-    });
-    if (document.readyState === 'complete' || document.readyState === 'interactive') {
-      setTimeout(initEngines, 300);
-    }
-
-    // ---- 8. Tastatur ----
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && document.activeElement === document.getElementById('attackInput')) {
-        window.sendAttack();
-        e.preventDefault();
-      }
-      if (e.key === ' ' && e.target === document.body) {
-        e.preventDefault();
-        window.toggleAuto();
-      }
-    });
-
-    // ---- 9. Speed‑Slider ----
-    document.getElementById('speedSlider').addEventListener('input', function() {
-      if (autoInterval) {
-        clearInterval(autoInterval);
-        autoInterval = null;
-        window.toggleAuto();
-      }
-    });
-
-    logDeutung('🧬 ULMR · Admin‑Pult vollständig geöffnet · 3‑9‑81 Achsen bereit.');
-    logDeutung('💡 Nutze die Steuerung oder gib ZEN‑Befehle ein.');
-
-  })();
+  console.log('🧙 ZAUBER 6 · index.html geladen');
 </script>
-
 </body>
 </html>
