@@ -1,1 +1,48 @@
 
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>W – Vorwärts</title>
+<style>
+body { background:#000; color:#0f0; font-family:monospace; padding:20px; }
+pre  { background:#111; padding:20px; border:1px solid #333; color:#0f0; }
+h2   { color:#6cf; }
+</style>
+</head>
+
+<body>
+
+<h2>W – Vorwärts</h2>
+
+<pre>
+ID: ULRM-W
+ROLE: forward
+MODE: RAW / RESPO
+STATUS: active
+
+DATA:
+  axis: x
+  step: +1
+  effect: "LAGE.x = LAGE.x + 1"
+  modi: "W"
+  rawator: "push"
+  pimp: "Betrachtung: Vortrieb"
+
+ENGINE:
+  function ULRM_W(LAGE){
+      return {
+          x: LAGE.x + 1,
+          y: LAGE.y,
+          z: LAGE.z,
+          modi: "W",
+          role: "forward"
+      };
+  }
+
+RESULT:
+  LAGE bewegt sich vorwärts (x + 1).
+</pre>
+
+</body>
+</html>
