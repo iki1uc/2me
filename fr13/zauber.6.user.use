@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>RAWATOR – Rohmotor / Neutralebene</title>
+<title>RAWATOR – Rohmotor / amor </title>
 <style>
 body { background:#000; color:#0f0; font-family:monospace; padding:20px; }
 pre  { background:#111; padding:20px; border:1px solid #333; color:#0f0; }
@@ -12,7 +12,7 @@ h2   { color:#6cf; }
 
 <body>
 
-<h2>RAWATOR – Rohmotor / Neutralebene</h2>
+<h2>RAWATOR – Rohmotor / ano.ma.niot </h2>
 
 <pre>
 ID: RAWATOR-CORE
@@ -29,7 +29,7 @@ DATA:
   power: "raw"
   neutral: true
   drive: "vector"
-  effect: "Grundbewegung für alle Achsen"
+  effect: "zauber 6 für alle Achsen"
   modi: "RAW"
   cube: "motor-core"
   mir: "Motor sichtbar"
