@@ -1,1 +1,37 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>REW – Rückwärtsdaten</title>
+<style>
+body { background:#000; color:#0f0; font-family:monospace; padding:20px; }
+pre { background:#111; padding:10px; border:1px solid #333; }
+</style>
+</head>
+<body>
 
+<h2>REW – Rückwärts-Operator</h2>
+
+<pre>
+ID: ULRM-REW
+ROLE: rewind
+MODE: RAW / RESPO
+STATUS: active
+
+DATA:
+  step: -1
+  direction: "zurück"
+  effect: "LAGE.x - 1"
+  respo: "Führung nach hinten"
+  modi: "S"
+  cube: "back-face"
+  rawator: "pull"
+  mir: "Vergangenheit sichtbar"
+  pimp: "Betrachtung: Rückwärts"
+
+RESULT:
+  LAGE bewegt sich zurück.
+</pre>
+
+</body>
+</html>
