@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>⚙️ ADMIN‑PULT · ULMR · 3‑9‑81 ACHSEN</title>
+
+  <!-- ===== DEIN EXISTIERENDES CSS ===== -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- ===== ZUSÄTZLICHES ADMIN‑CSS ===== -->
+  <style>
+    :root {
+      --bg: #0a0a12;
+      --fg: #0ff;
+      --gold: #ffd700;
+      --vital: #00ff88;
+      --co2: #ff6600;
+      --wasser: #66ccff;
+      --sauerstoff: #00ff88;
+      --anime: #ff66ff;
+      --shuffle: #ffaa00;
+      --orbit: #6b6bff;
+      --suite: #ff66ff;
+      --commander: #ff8c00;
+      --admin0: #ff0044;
+      --magneto: #ff00ff;
+      --krümmung: #00ffff;
+      --bootlink: #6ec8ff;
+      --achse1: #ffaa44;
+      --achse2: #44ffaa;
+      --achse3: #aa44ff;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'Consolas', monospace;
+      padding: 12px;
+      background-image: radial-gradient(ellipse at 20% 30%, #0c0c1a 0%, #000 100%);
+    }
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      border-bottom: 2px solid var(--gold);
+      padding-bottom: 10px;
+      margin-bottom: 16px;
+    }
+    .admin-header h1 {
+      font-size: 22px;
+      letter-spacing: 4px;
+    }
+    .admin-header h1 .ulmr { color: var(--gold); }
+    .admin-header h1 .achse { color: var(--achse1); }
+    .admin-header .status-led {
+      display: flex;
+      gap: 16px;
+      font-size: 11px;
+    }
+    .admin-header .status-led .dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 4px;
+    }
+    .dot.green { background: #4f4; box-shadow: 0 0 8px #4f4; }
+    .dot.yellow { background: #ffa; box-shadow: 0 0 8px #ffa; }
+    .dot.red { background: #f44; box-shadow: 0 0 8px #f44; }
+
+    .achsen-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 1000px) { .achsen-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 700px) { .achsen-grid { grid-template-columns: 1fr; } }
+
+    .achse-panel {
+      background: rgba(10,10,20,0.75);
+      border: 1px solid #1a1a2a;
+      border-radius: 12px;
+      padding: 12px;
+      backdrop-filter: blur(6px);
+    }
+    .achse-panel h2 {
+      color: var(--gold);
+      font-size: 13px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      padding-bottom: 6px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .achse-panel h2 .badge {
+      font-size: 9px;
+      background: #1a1a2a;
+      padding: 2px 8px;
+      border-radius: 20px;
+      color: #888;
+    }
+    .achse-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+    }
+    .metric-item {
+      background: #0e0e1a;
+      border-radius: 4px;
+      padding: 4px 8px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+    }
+    .metric-item .label { color: #666; }
+    .metric-item .value { font-weight: bold; }
+    .value.achse1 { color: var(--achse1); }
+    .value.achse2 { color: var(--achse2); }
+    .value.achse3 { color: var(--achse3); }
+
+    .deutung-panel {
+      background: rgba(10,10,20,0.7);
+      border: 1px solid #1a1a2a;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 16px;
+    }
+    .deutung-panel h2 {
+      color: var(--gold);
+      font-size: 13px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      padding-bottom: 6px;
+      margin-bottom: 8px;
+    }
+    #deutung-output {
+      background: #06060a;
+      border-radius: 6px;
+      padding: 8px;
+      font-size: 10px;
+      max-height: 120px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      color: #88ddbb;
+      border: 1px solid #1a1a2a;
+      line-height: 1.5;
+    }
+
+    .controls-zone {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      background: rgba(10,10,20,0.5);
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 12px;
+      border: 1px solid #1a1a2a;
+    }
+    .controls-zone button {
+      background: #111;
+      color: var(--fg);
+      border: 1px solid #333;
+      padding: 4px 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 9px;
+      transition: 0.2s;
+    }
+    .controls-zone button:hover { border-color: var(--gold); background: #1a1a2a; }
+    .controls-zone button.primary { border-color: var(--gold); color: var(--gold); }
+    .controls-zone button.primary:hover { background: var(--gold); color: #000; }
+    .controls-zone button.attack { border-color: var(--commander); color: var(--commander); }
+    .controls-zone button.attack:hover { background: var(--commander); color: #000; }
+    .controls-zone button.mesh { border-color: var(--vital); color: var(--vital); }
+    .controls-zone button.mesh:hover { background: var(--vital); color: #000; }
+    .controls-zone input {
+      background: #1e242c;
+      border: 1px solid #2f3542;
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 9px;
+      flex: 1;
+      min-width: 140px;
+    }
+
+    .boot-block-monitor {
+      background: rgba(10,10,20,0.7);
+      border: 1px solid #1a1a2a;
+      border-radius: 10px;
+      padding: 10px;
+      margin-top: 8px;
+    }
+    .boot-block-monitor .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 10px;
+    }
+    .boot-block-monitor .row .item {
+      color: #666;
+    }
+    .boot-block-monitor .row .item span {
+      color: var(--bootlink);
+      font-weight: bold;
+    }
+
+    .footer-admin {
+      margin-top: 16px;
+      padding: 8px 12px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 6px;
+      font-size: 9px;
+      color: #445555;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+    .footer-admin .gold { color: var(--gold); }
+  </style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<div class="admin-header">
+  <h1>
+    <span class="ulmr">⚙️ ULMR</span>
+    <span style="color:#666;">·</span>
+    <span class="achse">3‑9‑81 ACHSEN</span>
+    <span style="color:#666;">·</span>
+    <span style="color:var(--gold);">ADMIN‑PULT</span>
+  </h1>
+  <div class="status-led">
+    <span><span class="dot green"></span> 3.js</span>
+    <span><span class="dot green"></span> 9.js</span>
+    <span><span class="dot green"></span> 81.js</span>
+    <span id="sys-clock" style="color:#666;">⏱️ --:--</span>
+  </div>
+</div>
+
+<!-- ===== DREI ACHSEN (ENGINES) ===== -->
+<div class="achsen-grid">
+  <div class="achse-panel" id="achse-welt">
+    <h2>🌍 WELT‑ACHSE <span class="badge">3.js</span></h2>
+    <div class="achse-metrics">
+      <div class="metric-item"><span class="label">Router</span><span class="value achse1" id="welt-router">—</span></div>
+      <div class="metric-item"><span class="label">Stage</span><span class="value achse1" id="welt-stage">—</span></div>
+      <div class="metric-item"><span class="label">Plugins</span><span class="value achse1" id="welt-plugins">—</span></div>
+      <div class="metric-item"><span class="label">UI‑Badges</span><span class="value achse1" id="welt-badges">—</span></div>
+    </div>
+  </div>
+
+  <div class="achse-panel" id="achse-kraft">
+    <h2>⚡ KRAFT‑ACHSE <span class="badge">9.js</span></h2>
+    <div class="achse-metrics">
+      <div class="metric-item"><span class="label">Attack‑Queue</span><span class="value achse2" id="kraft-queue">—</span></div>
+      <div class="metric-item"><span class="label">ZEN‑Parser</span><span class="value achse2" id="kraft-zen">—</span></div>
+      <div class="metric-item"><span class="label">Input‑Dispatcher</span><span class="value achse2" id="kraft-input">—</span></div>
+      <div class="metric-item"><span class="label">Befehle</span><span class="value achse2" id="kraft-cmds">0</span></div>
+    </div>
+  </div>
+
+  <div class="achse-panel" id="achse-leben">
+    <h2>🧬 LEBENS‑ACHSE <span class="badge">81.js</span></h2>
+    <div class="achse-metrics">
+      <div class="metric-item"><span class="label">Mesh‑Zellen</span><span class="value achse3" id="leben-zellen">81</span></div>
+      <div class="metric-item"><span class="label">Tick</span><span class="value achse3" id="leben-tick">0</span></div>
+      <div class="metric-item"><span class="label">Vital</span><span class="value achse3" id="leben-vital">0.00</span></div>
+      <div class="metric-item"><span class="label">Drift</span><span class="value achse3" id="leben-drift">0.00</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DEUTUNGS‑PANEL ===== -->
+<div class="deutung-panel">
+  <h2>📖 DEUTUNG · ZEN‑INTERPRETATION & MESH‑LOG</h2>
+  <div id="deutung-output">▶ ULMR · Admin‑Pult bereit · warte auf Engine‑Daten …</div>
+</div>
+
+<!-- ===== STEUERUNGSZENTRALE ===== -->
+<div class="controls-zone">
+  <input id="attackInput" placeholder="SHOCK / WAVE / LINK / PUSH / GROW / MOVE / BREAK" />
+  <button class="attack" onclick="sendAttack()">⚡ SENDEN</button>
+  <button class="mesh" onclick="pauseLoop()">⏸ PAUSE</button>
+  <button class="mesh" onclick="stepLoop()">⏭ SCHRITT</button>
+  <button class="mesh" onclick="resetMesh()">⟲ RESET</button>
+  <button class="primary" onclick="toggleAuto()">▶ AUTO</button>
+  <span style="color:#666;font-size:9px;margin-left:4px;">Speed:</span>
+  <input type="range" id="speedSlider" min="1" max="10" value="3" style="width:80px;background:#1e242c;" />
+</div>
+
+<!-- ===== BOOT‑BLOCK‑MONITOR ===== -->
+<div class="boot-block-monitor">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+    <span style="color:var(--gold);font-size:11px;">🔗 BOOT.BLOCK LINK</span>
+    <span id="boot-status" style="color:#666;font-size:9px;">○ nicht verbunden</span>
+  </div>
+  <div class="row">
+    <div class="item">MODE <span id="boot-mode">—</span></div>
+    <div class="item">ACHSEN (A81) <span id="boot-achsen">—</span></div>
+    <div class="item">ZAHNRAD <span id="boot-gear">—</span></div>
+    <div class="item">ENERGIE <span id="boot-energy">—</span></div>
+    <div class="item"><button class="bootlink" onclick="reloadBootFrame()" style="background:#111;border:1px solid #333;color:#6ec8ff;padding:2px 10px;border-radius:4px;cursor:pointer;">🔄 neu laden</button></div>
+  </div>
+  <iframe id="bootFrame" src="master-boot-block.html" style="display:none;"></iframe>
+</div>
+
+<!-- ===== FOOTER ===== -->
+<div class="footer-admin">
+  <span>🧬 ULMR‑KERN: <span class="gold">3 · 9 · 81</span></span>
+  <span>🌀 ACHSEN: <span class="gold">WELT · KRAFT · LEBEN</span></span>
+  <span>⚡ ADMIN‑PULT · vollständig geöffnet</span>
+</div>
+
+<!-- ============================================================= -->
+<!-- =====  DIE DREI ENGINES LADEN (Reihenfolge: 3 → 9 → 81) ===== -->
+<!-- ============================================================= -->
+<script src="3.js"></script>
+<script src="9.js"></script>
+<script src="81.js"></script>
+
+<!-- ============================================================= -->
+<!-- =====  ADMIN‑PULT LOGIK (steuert die Engines) ================ -->
+<!-- ============================================================= -->
+<script>
+  (function() {
+    'use strict';
+
+    // ---- DOM-Referenzen ----
+    const deutung = document.getElementById('deutung-output');
+    const bootStatus = document.getElementById('boot-status');
+
+    // ---- Hilfsfunktionen für Log ----
+    function logDeutung(msg, type = 'info') {
+      const time = new Date().toLocaleTimeString();
+      deutung.innerHTML += `[${time}] ${msg}\n`;
+      deutung.scrollTop = deutung.scrollHeight;
+      if (deutung.children.length > 50) deutung.innerHTML = deutung.innerHTML.split('\n').slice(-40).join('\n');
+    }
+
+    // ---- 1. Engine‑Checks & Achsen‑Update ----
+    function updateAchsen() {
+      // Welt (3.js)
+      if (typeof window.ROUTER !== 'undefined') {
+        document.getElementById('welt-router').textContent = window.ROUTER.current || 'aktiv';
+      }
+      if (typeof window.STAGE !== 'undefined') {
+        document.getElementById('welt-stage').textContent = window.STAGE.mode || '3D';
+      }
+      if (typeof window.PLUGIN_CORE !== 'undefined') {
+        document.getElementById('welt-plugins').textContent = Object.keys(window.PLUGIN_CORE).length || '13';
+        document.getElementById('welt-badges').textContent = window.PLUGIN_CORE.activeCount || '0';
+      }
+
+      // Kraft (9.js)
+      if (typeof window.ATTACK_QUEUE !== 'undefined') {
+        document.getElementById('kraft-queue').textContent = window.ATTACK_QUEUE.length || 0;
+      }
+      if (typeof window.ZEN !== 'undefined') {
+        document.getElementById('kraft-zen').textContent = window.ZEN.status || 'bereit';
+      }
+      if (typeof window.INPUT_DISPATCHER !== 'undefined') {
+        document.getElementById('kraft-input').textContent = window.INPUT_DISPATCHER.mode || 'aktiv';
+      }
+
+      // Leben (81.js)
+      if (typeof window.MESH !== 'undefined') {
+        document.getElementById('leben-zellen').textContent = window.MESH.cells ? window.MESH.cells.length : 81;
+        document.getElementById('leben-tick').textContent = window.MESH.tick || 0;
+        document.getElementById('leben-vital').textContent = (window.MESH.vital || 0).toFixed(2);
+        document.getElementById('leben-drift').textContent = (window.MESH.drift || 0).toFixed(2);
+      }
+    }
+
+    // ---- 2. Boot‑Block‑Sync ----
+    function syncBootBlock() {
+      try {
+        const frame = document.getElementById('bootFrame');
+        const state = frame.contentWindow.STATE;
+        if (!state) throw new Error('STATE nicht bereit');
+        document.getElementById('boot-mode').textContent = state.mode || '—';
+        document.getElementById('boot-achsen').textContent = state.a81 || '—';
+        document.getElementById('boot-gear').textContent = state.gear || '—';
+        document.getElementById('boot-energy').textContent = (state.energy || 0) + '%';
+        bootStatus.textContent = '● verbunden';
+        bootStatus.style.color = '#4f4';
+      } catch (e) {
+        bootStatus.textContent = '○ nicht verbunden (Cross‑Origin oder Frame nicht geladen)';
+        bootStatus.style.color = '#666';
+      }
+    }
+
+    window.reloadBootFrame = function() {
+      document.getElementById('bootFrame').src = document.getElementById('bootFrame').src;
+      logDeutung('🔄 BOOT.BLOCK‑Frame neu geladen');
+    };
+
+    // ---- 3. Steuerungsfunktionen (verknüpfen mit Engines) ----
+    window.sendAttack = function() {
+      const input = document.getElementById('attackInput');
+      const cmd = input.value.trim();
+      if (!cmd) return;
+      if (typeof window.processZEN === 'function') {
+        window.processZEN(cmd);
+        logDeutung(`⚡ Attack: ${cmd} → ZEN verarbeitet`);
+      } else if (typeof window.dispatchAttack === 'function') {
+        window.dispatchAttack(cmd);
+        logDeutung(`⚡ Attack: ${cmd} → dispatchAttack`);
+      } else {
+        logDeutung(`⚠️ Keine Attack‑Engine gefunden. Befehl: ${cmd}`, 'warn');
+      }
+      input.value = '';
+      updateAchsen();
+    };
+
+    window.pauseLoop = function() {
+      if (typeof window.togglePause === 'function') {
+        window.togglePause();
+        logDeutung('⏸ Pause umgeschaltet');
+      } else {
+        logDeutung('⚠️ togglePause() nicht gefunden', 'warn');
+      }
+    };
+
+    window.stepLoop = function() {
+      if (typeof window.stepTick === 'function') {
+        window.stepTick();
+        logDeutung('⏭ Einzelner Tick ausgeführt');
+        updateAchsen();
+      } else {
+        logDeutung('⚠️ stepTick() nicht gefunden', 'warn');
+      }
+    };
+
+    window.resetMesh = function() {
+      if (typeof window.resetGrid === 'function') {
+        window.resetGrid();
+        logDeutung('⟲ Mesh zurückgesetzt');
+        updateAchsen();
+      } else {
+        logDeutung('⚠️ resetGrid() nicht gefunden', 'warn');
+      }
+    };
+
+    let autoInterval = null;
+    window.toggleAuto = function() {
+      if (autoInterval) {
+        clearInterval(autoInterval);
+        autoInterval = null;
+        logDeutung('⏸ AUTO‑Modus deaktiviert');
+        return;
+      }
+      const speed = parseInt(document.getElementById('speedSlider').value) || 3;
+      const delay = Math.max(200, 2000 / speed);
+      autoInterval = setInterval(() => {
+        if (typeof window.stepTick === 'function') {
+          window.stepTick();
+          updateAchsen();
+        }
+      }, delay);
+      logDeutung(`▶ AUTO‑Modus aktiv (Speed ${speed}, ${delay}ms)`);
+    };
+
+    // ---- 4. Initialisierung der Engines (wenn verfügbar) ----
+    function initEngines() {
+      let ok = true;
+      try {
+        if (typeof initMesh === 'function') { initMesh(); logDeutung('✅ 81.js · Mesh initialisiert'); }
+        else { logDeutung('⚠️ initMesh() nicht gefunden', 'warn'); ok = false; }
+        if (typeof initUI === 'function') { initUI(); logDeutung('✅ 3.js · UI initialisiert'); }
+        else { logDeutung('⚠️ initUI() nicht gefunden', 'warn'); ok = false; }
+        if (typeof initZEN === 'function') { initZEN(); logDeutung('✅ 9.js · ZEN initialisiert'); }
+        else { logDeutung('⚠️ initZEN() nicht gefunden', 'warn'); ok = false; }
+        if (typeof startLoop === 'function') { startLoop(); logDeutung('✅ Tick‑Loop gestartet'); }
+        else { logDeutung('⚠️ startLoop() nicht gefunden', 'warn'); ok = false; }
+      } catch (e) {
+        logDeutung(`❌ Fehler beim Initialisieren: ${e.message}`, 'error');
+        ok = false;
+      }
+      if (ok) {
+        logDeutung('🚀 ULMR · Alle drei Achsen sind aktiv.');
+      } else {
+        logDeutung('⚠️ Einige Engine‑Funktionen fehlen – simuliere Basiswerte.', 'warn');
+        // Fallback‑Simulation, damit das UI nicht leer bleibt
+        window.MESH = window.MESH || { cells: Array(81).fill(0), tick: 0, vital: 0.5, drift: 0.1 };
+        window.ATTACK_QUEUE = window.ATTACK_QUEUE || [];
+        window.ZEN = window.ZEN || { status: 'simuliert' };
+        window.ROUTER = window.ROUTER || { current: 'simuliert' };
+        window.PLUGIN_CORE = window.PLUGIN_CORE || { activeCount: 0 };
+      }
+      updateAchsen();
+    }
+
+    // ---- 5. Taktgeber ----
+    setInterval(() => {
+      updateAchsen();
+      syncBootBlock();
+    }, 500);
+
+    // ---- 6. Uhr ----
+    function updateClock() {
+      document.getElementById('sys-clock').textContent = `⏱️ ${new Date().toLocaleTimeString()}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // ---- 7. Start ----
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(initEngines, 300);
+    });
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      setTimeout(initEngines, 300);
+    }
+
+    // ---- 8. Tastatur ----
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && document.activeElement === document.getElementById('attackInput')) {
+        window.sendAttack();
+        e.preventDefault();
+      }
+      if (e.key === ' ' && e.target === document.body) {
+        e.preventDefault();
+        window.toggleAuto();
+      }
+    });
+
+    // ---- 9. Speed‑Slider ----
+    document.getElementById('speedSlider').addEventListener('input', function() {
+      if (autoInterval) {
+        clearInterval(autoInterval);
+        autoInterval = null;
+        window.toggleAuto();
+      }
+    });
+
+    logDeutung('🧬 ULMR · Admin‑Pult vollständig geöffnet · 3‑9‑81 Achsen bereit.');
+    logDeutung('💡 Nutze die Steuerung oder gib ZEN‑Befehle ein.');
+
+  })();
+</script>
+
+</body>
+</html>
