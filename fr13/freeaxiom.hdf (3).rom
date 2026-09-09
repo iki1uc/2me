@@ -1,0 +1,29 @@
+// freeaxiom.hdf.rom
+// Diese Datei definiert eine freie Axiom‑Zone mit Frage + Antwort
+
+export default {
+
+    // Axiom‑Identität
+    axiom: "free",
+    zone: "free-zone",
+
+    // Numerische Werte
+    vector: 1.00,
+    konstante: 1.00,
+    flow: 1.00,
+    torque: 1.00,
+
+    // Narrativ / Diagnose
+    beschreibung: "Freies Axiom – automatisch zuweisbar",
+
+    // Frage + Antwort System
+    frage: "Welches Axiom soll aktiviert werden?",
+    antwort: "Das freie Axiom wurde aktiviert und steht bereit.",
+
+    // Pipeline‑Meta
+    meta: {
+        version: "1.0",
+        kompatibel: ["bewegung.ready", "pipeline.blitz", "dispatch.knoten"],
+        aktiv: true
+    }
+};

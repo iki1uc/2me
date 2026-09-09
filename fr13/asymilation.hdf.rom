@@ -1,0 +1,34 @@
+// asymilation.hdf.rom
+// Axiom-Datei für die Asymilation-Dispatcher-Technik
+
+export default {
+
+    // Identität
+    axiom: "asym",
+    zone: "asymilation-zone",
+
+    // Numerische Engine-Werte
+    vector: 1.77,
+    konstante: 0.444,
+    flow: 1.33,
+    torque: 2.11,
+
+    // Narrativ / Diagnose
+    beschreibung: "Asymilation – Dispatcher für Fremdzonen, Fremdaxiome und Raum-Integration",
+
+    // Frage + Antwort System
+    frage: "Wie soll die fremde Zone asymiliert werden?",
+    antwort: "Die Zone wurde erfolgreich asymiliert und in den Systemraum integriert.",
+
+    // Meta-Informationen
+    meta: {
+        version: "1.0",
+        kompatibel: [
+            "bewegung.ready",
+            "desamalatzion.ready",
+            "pipeline.blitz",
+            "dispatch.knoten"
+        ],
+        aktiv: true
+    }
+};
