@@ -1,1 +1,66 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>ULRM · DIR – Entscheidungsebene</title>
+<style>
+body{
+  background:#000;
+  color:#0f0;
+  font-family:monospace;
+  padding:20px;
+}
+pre{
+  background:#111;
+  padding:20px;
+  border:1px solid #333;
+  white-space:pre-wrap;
+}
+h2{
+  color:#6cf;
+}
+</style>
+</head>
 
+<body>
+
+<h2>ULRM · DIR – Entscheidungsebene</h2>
+
+<pre>
+ID: ULRM-DIR
+ROLE: decision-layer
+
+DIMENSION:
+  Ebene: 9
+  Bindung: 8 → 9
+  Funktion: Entscheidung, Routing, Richtung
+
+MODULES:
+  A – Links
+  B – Rechts
+  C – Cycle
+  D – Rechts
+  E – Vor
+  F – Zurück
+  G – Diagonal
+  H – Rotation
+
+DECISION ENGINE:
+  function ULRM_DIR(input){
+      return {
+          source: input.module,
+          axis: input.axis,
+          step: input.step,
+          route: "DIR",
+          decision: "accepted",
+          layer: 9
+      };
+  }
+
+RESULT:
+  DIR aktiviert die Entscheidungsebene.
+  Alle ULRM-Module werden durch DIR geroutet.
+</pre>
+
+</body>
+</html>
