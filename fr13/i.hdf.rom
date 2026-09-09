@@ -1,1 +1,47 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>S – Rückwärts</title>
+<style>
+body { background:#000; color:#0f0; font-family:monospace; padding:20px; }
+pre  { background:#111; padding:20px; border:1px solid #333; color:#0f0; }
+h2   { color:#6cf; }
+</style>
+</head>
 
+<body>
+
+<h2>S – Rückwärts</h2>
+
+<pre>
+ID: ULRM-S
+ROLE: backward
+MODE: RAW / RESPO
+STATUS: active
+
+DATA:
+  axis: x
+  step: -1
+  effect: "LAGE.x = LAGE.x - 1"
+  modi: "S"
+  rawator: "reverse"
+  pimp: "Betrachtung: Rückzug"
+
+ENGINE:
+  function ULRM_S(LAGE){
+      return {
+          x: LAGE.x - 1,
+          y: LAGE.y,
+          z: LAGE.z,
+          modi: "S",
+          role: "backward"
+      };
+  }
+
+RESULT:
+  LAGE bewegt sich rückwärts (x - 1).
+</pre>
+
+</body>
+</html>
