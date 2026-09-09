@@ -1,1 +1,36 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>NC · AXIS‑36E</title>
+<style>
+body{background:#000;color:#0f0;font-family:monospace;padding:20px;}
+button{padding:10px 20px;background:#111;color:#0f0;border:1px solid #333;cursor:pointer;margin:6px;}
+pre{background:#111;padding:10px;margin-top:20px;white-space:pre-wrap;}
+</style>
+</head>
+<body>
 
+<h1>NC – AXIS‑Bewegung</h1>
+
+<button onclick="ncMove('N→')">N→</button>
+<button onclick="ncMove('N←')">N←</button>
+<button onclick="ncMove('N↑')">N↑</button>
+<button onclick="ncMove('N↓')">N↓</button>
+
+<button onclick="ncMove('NC↻')">NC↻</button>
+<button onclick="ncMove('NC↺')">NC↺</button>
+<button onclick="ncMove('NC+')">NC+</button>
+<button onclick="ncMove('NC-')">NC-</button>
+
+<button onclick="ncNeutral()">Neutral</button>
+
+<button onclick="ncAI()">KI‑Move</button>
+
+<pre id="nc_out">NC bereit…</pre>
+
+<script src="nc.param.js"></script>
+<script src="nc.kernel.js"></script>
+
+</body>
+</html>
