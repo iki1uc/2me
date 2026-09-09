@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>⚽ SOCCER · Team‑Sheet</title>
+  <title>🌤️ WETTER · Orbit‑Modus</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -43,9 +43,9 @@
       font-size: 1.2rem;
       margin-bottom: 12px;
     }
-    .grid-2 {
+    .grid-3 {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(3, 1fr);
       gap: 16px;
     }
     .card {
@@ -60,7 +60,7 @@
       text-transform: uppercase;
     }
     .card .value {
-      font-size: 1.4rem;
+      font-size: 1.6rem;
       font-weight: bold;
       margin-top: 4px;
     }
@@ -111,28 +111,27 @@
     .log-warning { color: #f0c060; }
     .log-error { color: #e06050; }
     @media (max-width: 700px) {
-      .grid-2 { grid-template-columns: 1fr; }
+      .grid-3 { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 <div class="container">
-  <h1>⚽ SOCCER · Team‑Sheet</h1>
-  <div class="sub">Soccer‑Ableitungen · Rollen · FP‑Codes · Mismatch</div>
+  <h1>🌤️ WETTER · Orbit‑Modus</h1>
+  <div class="sub">Wetter‑Ebene · Fixpunkt · Orbit‑Modus · RUN 3‑kompatibel</div>
 
   <div class="panel">
-    <h2>👥 Team‑Dashboard</h2>
-    <div class="grid-2" id="soccerGrid">
-      <div class="card"><div class="label">Leader</div><div class="value" id="leader">—</div></div>
-      <div class="card"><div class="label">Follower</div><div class="value" id="follower">—</div></div>
-      <div class="card"><div class="label">FP‑Codes</div><div class="value" id="fpCodes">—</div></div>
-      <div class="card"><div class="label">Mismatch</div><div class="value" id="mismatch">—</div></div>
+    <h2>🌡️ Wetter‑Dashboard</h2>
+    <div class="grid-3" id="wetterGrid">
+      <div class="card"><div class="label">Fixpunkt</div><div class="value" id="fix">—</div></div>
+      <div class="card"><div class="label">Orbit‑Modus</div><div class="value" id="orbit">—</div></div>
+      <div class="card"><div class="label">STATE</div><div class="value" id="wetterState">—</div></div>
     </div>
   </div>
 
   <div class="panel">
     <h2>🔄 Steuerung</h2>
-    <button class="btn" id="btnRefresh">🔄 Team aktualisieren</button>
+    <button class="btn" id="btnRefresh">🔄 Wetter aktualisieren</button>
     <button class="btn btn-gold" id="btnReport">📡 Report senden</button>
   </div>
 
@@ -145,11 +144,11 @@
 <script type="module">
   import { report, autoReport, getGlobalStatus, onUpdate } from './respo-master.js';
 
+  // State
   const state = {
-    leader: '—',
-    follower: '—',
-    fpCodes: '—',
-    mismatch: false,
+    fix: 0,
+    orbitMode: 'IQQ',
+    status: 'neutral',
   };
 
   const $ = id => document.getElementById(id);
@@ -165,54 +164,50 @@
     box.scrollTop = box.scrollHeight;
   }
 
-  function updateSoccer() {
-    const leaders = ['👑 Alpha', '🦁 Bravo', '🐺 Charlie'];
-    const followers = ['🛡️ Delta', '🛡️ Echo', '🛡️ Foxtrot'];
-    state.leader = leaders[Math.floor(Math.random() * leaders.length)];
-    state.follower = followers[Math.floor(Math.random() * followers.length)];
-    state.fpCodes = `FP-${Math.floor(1000 + Math.random() * 9000)}`;
-    state.mismatch = Math.random() < 0.15;
+  function updateWetter() {
+    state.fix = Math.floor(Math.random() * 100);
+    const modes = ['IQQ', 'NC', 'OCTA', 'A81'];
+    state.orbitMode = modes[Math.floor(Math.random() * modes.length)];
+    state.status = state.orbitMode === 'NC' ? '🌪️ stürmisch' : '☀️ stabil';
     updateUI();
-    log(`⚽ Team aktualisiert: Leader ${state.leader}, FP ${state.fpCodes}`, 'info');
-    if (state.mismatch) log('⚠️ MISMATCH erkannt!', 'error');
+    log(`🌤️ Wetter aktualisiert: Fix ${state.fix}, Orbit ${state.orbitMode}`, 'info');
   }
 
   function updateUI() {
-    $('leader').textContent = state.leader;
-    $('follower').textContent = state.follower;
-    $('fpCodes').textContent = state.fpCodes;
-    $('mismatch').textContent = state.mismatch ? '⚠️ JA' : '✅ NEIN';
-    $('mismatch').style.color = state.mismatch ? '#e06050' : '#6fdb6f';
+    $('fix').textContent = state.fix;
+    $('orbit').textContent = state.orbitMode;
+    $('wetterState').textContent = state.status;
   }
 
-  function getSoccerPayload() {
+  function getWetterPayload() {
     return {
-      leader: state.leader,
-      follower: state.follower,
-      fpCodes: state.fpCodes,
-      mismatch: state.mismatch,
+      fix: state.fix,
+      orbitMode: state.orbitMode,
+      status: state.status,
       timestamp: Date.now(),
     };
   }
 
-  autoReport('SOCCER', getSoccerPayload, 5000);
+  // Auto-Report alle 5s
+  autoReport('WETTER', getWetterPayload, 5000);
 
-  $('btnRefresh').addEventListener('click', updateSoccer);
+  $('btnRefresh').addEventListener('click', updateWetter);
   $('btnReport').addEventListener('click', () => {
-    report('SOCCER', getSoccerPayload());
+    report('WETTER', getWetterPayload());
     log('📡 Report gesendet', 'success');
   });
 
   onUpdate((data) => {
     if (data.name === 'FOUNDER') {
-      log(`👑 Founder-Status: ${data.payload.running ? 'läuft' : 'gestoppt'}`, 'info');
+      log(`👑 Founder: ${data.payload.running ? 'läuft' : 'gestoppt'}`, 'info');
     } else if (data.name === 'NC_MOVE') {
       log(`🌀 MOVE-Energie: ${data.payload.totalEnergy || '?'}`, 'info');
     }
   });
 
-  updateSoccer();
-  log('⚽ SOCCER-Modul gestartet', 'success');
+  // Init
+  updateWetter();
+  log('🌤️ WETTER-Modul gestartet', 'success');
 </script>
 </body>
 </html>
