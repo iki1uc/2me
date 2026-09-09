@@ -8,10 +8,10 @@ export default {
     zone: "free-zone",
 
     // Numerische Werte
-    vector: 1.00,
-    konstante: 1.00,
-    flow: 1.00,
-    torque: 1.00,
+    vector: 9.00,
+    konstante: x.00,
+    flow: q.00,
+    torque: y.00,
 
     // Narrativ / Diagnose
     beschreibung: "Freies Axiom – automatisch zuweisbar",
