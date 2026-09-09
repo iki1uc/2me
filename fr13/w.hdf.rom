@@ -1,1 +1,31 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>NC Übersicht · 36E</title>
+<style>
+body{background:#000;color:#0f0;font-family:monospace;padding:20px;}
+a{color:#0f0;text-decoration:none;}
+a:hover{text-decoration:underline;}
+ul{list-style:none;padding-left:0;}
+li{margin:6px 0;}
+</style>
+</head>
+<body>
 
+<h1>NC – Übersicht</h1>
+
+<p>NC‑Module:</p>
+
+<ul>
+  <li><a href="NC/nc_u.html">nc_u</a></li>
+  <li><a href="NC/nc_in.html">nc_in</a></li>
+  <li><a href="NC/nc_me.html">nc_me</a></li>
+  <li><a href="NC/nc_run.html">nc_run</a></li>
+  <li><a href="NC/nc_ces.html">nc_ces</a></li>
+  <li><a href="NC/nc_sec.html">nc_sec</a></li>
+</ul>
+
+<script src="nc.param.js"></script>
+</body>
+</html>
