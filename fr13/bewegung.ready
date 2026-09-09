@@ -1,1 +1,55 @@
+// ─── BEWEGUNG.READY ───────────────────────────────────────────
+// RUN3 · Bewegungs-Pump · Flow-Engine
+
+export const READY = {
+
+    name: "bewegung.ready",
+
+    input: {
+        x: 0,
+        y: 0,
+        z: 0,
+        axis: 3,
+        axiom: "e"
+    },
+
+    set(input = {}) {
+        Object.assign(this.input, input);
+        return this;
+    },
+
+    compute() {
+        const { x, y, z, axis, axiom } = this.input;
+
+        // Bewegung = Summe der Eingaben
+        const bewegung = x + y + z;
+
+        // Impuls = Bewegung × Achse
+        const impuls = bewegung * axis;
+
+        // Flow = Impuls × Axiom-Faktor
+        const axiomFactor = this.axiomVector(axiom);
+        const flow = impuls * axiomFactor;
+
+        return {
+            bewegung,
+            impuls,
+            flow,
+            axis,
+            axiom,
+            timestamp: new Date().toISOString()
+        };
+    },
+
+    axiomVector(key) {
+        const AX = {
+            d: 1.11, e: 1.33, i: 0.77,
+            n: 0.92, o: 1.44, r: 1.66,
+            s: 1.21, w: 1.55, u: 2.00
+        };
+        return AX[key] ?? 1;
+    }
+};
+
+export default READY;
 

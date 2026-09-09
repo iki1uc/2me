@@ -1,0 +1,51 @@
+// asymilation.ready
+// Dispatcher-Technik – Integration fremder Zonen, Axiome, Achsen
+
+export const READY = {
+
+    name: "asymilation.ready",
+
+    input: {
+        raum: "unknown",
+        axiom: "unknown",
+        axis: 0,
+        hdf: null
+    },
+
+    set(params = {}) {
+        Object.assign(this.input, params);
+        return this;
+    },
+
+    compute() {
+        const { raum, axiom, axis, hdf } = this.input;
+
+        // 1) Fremde Zone erkennen
+        const zone = hdf?.zone ?? `${axiom}-zone`;
+
+        // 2) Achsen-Anpassung
+        const axisMapped = axis === 0 ? 3 : axis;
+
+        // 3) Axiom-Anpassung
+        const axiomMapped = axiom === "unknown" ? "w" : axiom;
+
+        // 4) Integrations-Flow
+        const flow = (hdf?.flow ?? 1) * axisMapped;
+
+        // 5) Integrations-Torque
+        const torque = (hdf?.torque ?? 1) * 0.333;
+
+        return {
+            raum_alt: raum,
+            raum_neu: `${raum}-asymilated`,
+            zone,
+            axiom: axiomMapped,
+            axis: axisMapped,
+            flow,
+            torque,
+            timestamp: new Date().toISOString()
+        };
+    }
+};
+
+export default READY;
