@@ -1,1 +1,56 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>ULRM-C · Cycle</title>
+<style>
+body{
+  background:#000;
+  color:#0f0;
+  font-family:monospace;
+  padding:20px;
+}
+pre{
+  background:#111;
+  padding:20px;
+  border:1px solid #333;
+  white-space:pre-wrap;
+}
+h2{
+  color:#6cf;
+}
+</style>
+</head>
 
+<body>
+
+<h2>ULRM-C · Cycle</h2>
+
+<pre>
+ID: ULRM-C
+ROLE: cycle
+
+DATA:
+  axis: c
+  step: +1
+  effect: "LAGE.c = LAGE.c + 1"
+  modi: "C"
+
+ENGINE:
+  function ULRM_C(LAGE){
+      return {
+          x: LAGE.x,
+          y: LAGE.y,
+          z: LAGE.z,
+          c: (LAGE.c ?? 0) + 1,
+          modi: "C",
+          role: "cycle"
+      };
+  }
+
+RESULT:
+  LAGE durchläuft einen Zyklus (c + 1).
+</pre>
+
+</body>
+</html>
