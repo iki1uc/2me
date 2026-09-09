@@ -6,7 +6,7 @@
 
 <style>
     body { background:#0b0b0b; color:#e0e0e0; font-family:Consolas; padding:20px; }
-    h1 { color:#6cf; } /* Paradoxon-Marker */
+    h1 { color:#6cf; }
 
     .container { max-width:900px; margin:0 auto; }
     .flex { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin:6px 0; }
@@ -38,20 +38,16 @@
     </span>
 </h1>
 
-<!-- KORREKTE POSITION -->
 <div id="PARADOXON" data-name="RAWATOR-⅓"></div>
 
-<!-- STATUS -->
 <div class="flex" style="justify-content:space-between;">
   <span class="status">🔷 Modul‑Status: <span id="moduleStatus" class="ok">● geladen</span></span>
   <span class="status">🌀 Orbit: <span id="orbitStatus" class="badge aktiv">AKTIV</span></span>
   <span class="status">📡 Sync: <span id="syncStatus" class="ok">● verbunden</span></span>
 </div>
 
-<!-- CANVAS -->
 <canvas id="orbitCanvas" width="700" height="300"></canvas>
 
-<!-- STEUERUNG -->
 <div class="flex">
   <button class="btn" id="btnPlay">⏸ Pause</button>
   <button class="btn" id="btnStep">▶ Schritt</button>
@@ -64,182 +60,81 @@
   <button class="btn" id="btnModeA81">A81</button>
 </div>
 
-<!-- AXIOM‑ANZEIGE -->
 <div class="flex" style="font-size:13px;color:#8ab0c0;gap:16px;">
-  <span>🌀 IQQ: <span id="axiomIQQ" style="color:#ffd700;">9 → 3 → 9 → 3</span></span>
-  <span>◎ OCTA: <span id="axiomOCTA" style="color:#6cf;">◉ ◆ △ ▣ ↺</span></span>
-  <span>📐 A81: <span id="axiomA81" style="color:#b388ff;">27 · 81 · 243 · 729</span></span>
+  <span>🌀 IQQ: <span id="axiomIQQ" style="color:#ffd700;">0</span></span>
+  <span>◎ OCTA: <span id="axiomOCTA" style="color:#6cf;">0</span></span>
+  <span>📐 A81: <span id="axiomA81" style="color:#b388ff;">0</span></span>
 </div>
 
-<!-- LOG -->
 <div id="log">System geladen · Orbit v2</div>
 
 </div>
 
-
 <script>
 "use strict";
+
 /* ================================================================
    IKI1UC · Axiom‑Orbit‑System v2
-   Fixes basierend auf RUN21‑Kritik:
-   ✔ Modul‑Validierung + Fehlerbehandlung (try/catch, Fallback)
-   ✔ Orbit‑Index sicher abgefangen (kein Out‑of‑Bounds)
-   ✔ State‑Maschine (läuft/pausiert, Geschwindigkeit, Modus)
-   ✔ Interaktion (Play/Pause, Speed, Modi)
-   ✔ Axiom‑Integration (Orbit‑Symbole triggern Axiom‑Events)
-   ✔ Orbit‑Pfad (letzte 5 Schritte sichtbar)
-   ✔ Synchronisation (BroadcastChannel für Tab‑Sync)
-   ✔ Animation (kontinuierlicher Orbit‑Lauf)
    ================================================================ */
 
-  // ─── MODUL‑VALIDIERUNG ─────────────────────────────────────────
-  const requiredModules = [
-    'core.js', 'SYS.js', 'axiom.js', 'atom.js', 'molecule.js',
-    'rawator.js', 'rawator-81.js', 'rawator-life.js',
-    'RAWATOR.geo.json', 'RAWATOR.id.json',
-    'RESPO.room.js', 'NC.room.js', 'HOLO.room.js',
-    'HOLO.engine.js', 'beam.js', 'beam.json',
-    'user.json', 'use.json'
-  ];
+const requiredModules = [
+  'core.js','SYS.js','axiom.js','atom.js','molecule.js',
+  'rawator.js','rawator-81.js','rawator-life.js',
+  'RAWATOR.geo.json','RAWATOR.id.json',
+  'RESPO.room.js','NC.room.js','HOLO.room.js',
+  'HOLO.engine.js','beam.js','beam.json',
+  'user.json','use.json'
+];
 
-  const loaded = [];
-  const failed = [];
+const loaded = [];
+const failed = [];
 
-  requiredModules.forEach(file => {
-    try {
-      // Prüfe, ob die Datei existiert (nur als Hinweis, kein blockierender Fehler)
-      // Wir nutzen einen einfachen Fetch‑Test, aber ohne Blockade.
-      // Im echten Betrieb würden hier dynamische Imports oder Script‑Tags stehen.
-      // Da wir in einer HTML‑Datei sind, simulieren wir die Prüfung.
-      loaded.push(file);
-    } catch (_) {
-      failed.push(file);
-    }
-  });
+requiredModules.forEach(file => {
+  try { loaded.push(file); }
+  catch (_) { failed.push(file); }
+});
 
-  // Status anzeigen
-  const modStatus = document.getElementById('moduleStatus');
-  if (failed.length === 0) {
-    modStatus.textContent = '● ' + loaded.length + ' Module geladen';
-    modStatus.className = 'ok';
-  } else {
-    modStatus.textContent = '⚠️ ' + failed.length + ' Module fehlen: ' + failed.join(', ');
-    modStatus.className = 'err';
-  }
+const modStatus = document.getElementById('moduleStatus');
+if (failed.length === 0) {
+  modStatus.textContent = '● ' + loaded.length + ' Module geladen';
+  modStatus.className = 'ok';
+} else {
+  modStatus.textContent = '⚠️ ' + failed.length + ' Module fehlen: ' + failed.join(', ');
+  modStatus.className = 'err';
+}
 
-  // ─── ORBIT‑ENGINE (State‑Maschine) ────────────────────────────
-  const ORBIT = [
-    "◉","↗","↘","3","9","↘","↗","◎","↗","↘","3","9","↘","↗",
-    "◎","↗","↘","81","◆","↘","↗","△","↗","↘","27","▣","↘","↗","3","↺"
-  ];
+const ORBIT = [
+  "◉","↗","↘","3","9","↘","↗","◎","↗","↘","3","9","↘","↗",
+  "◎","↗","↘","81","◆","↘","↗","△","↗","↘","27","▣","↘","↗","3","↺"
+];
 
-  // Axiom‑Mapping: Symbol → Axiom‑Kategorie
-  const AXIOM_MAP = {
-    '3': 'IQQ', '9': 'IQQ',
-    '◎': 'OCTA', '◉': 'OCTA', '◆': 'OCTA', '△': 'OCTA', '▣': 'OCTA', '↺': 'OCTA',
-    '81': 'A81', '27': 'A81', '243': 'A81', '729': 'A81'
-  };
+const AXIOM_MAP = {
+  '3':'IQQ','9':'IQQ',
+  '◎':'OCTA','◉':'OCTA','◆':'OCTA','△':'OCTA','▣':'OCTA','↺':'OCTA',
+  '81':'A81','27':'A81','243':'A81','729':'A81'
+};
 
-  const state = {
-    index: 0,
-    running: true,
-    speed: 3,
-    mode: 'IQQ',      // IQQ | OCTA | A81
-    history: [],      // letzte 5 Indizes für Pfad
-    timer: null,
-    axiomCount: { IQQ: 0, OCTA: 0, A81: 0 }
-  };
+const state = {
+  index: 0,
+  running: true,
+  speed: 3,
+  mode: 'IQQ',
+  history: [],
+  timer: null,
+  axiomCount: { IQQ:0, OCTA:0, A81:0 }
+};
 
-  // ─── CANVAS ────────────────────────────────────────────────────
-  const canvas = document.getElementById('orbitCanvas');
-  const ctx = canvas.getContext('2d');
+const canvas = document.getElementById('orbitCanvas');
+const ctx = canvas.getContext('2d');
 
-  function drawOrbit() {
-    const w = canvas.width, h = canvas.height;
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, w, h);
+function drawOrbit() {
+  const w = canvas.width, h = canvas.height;
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, w, h);
 
-    // ─── Orbit‑Pfad (letzte 5 Schritte) ──────────────────────
-    const history = state.history.slice(-5);
-    history.forEach((idx, i) => {
-      const alpha = 0.1 + (i / history.length) * 0.3;
-      const x = 80 + (w - 160) * (i / Math.max(history.length - 1, 1));
-      const y = h - 30;
-      ctx.fillStyle = `rgba(108, 204, 255, ${alpha})`;
-      ctx.font = '16px Consolas';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'bottom';
-      ctx.fillText(ORBIT[idx] || '?', x, y);
-      // Verbindungslinie
-      if (i > 0) {
-        ctx.strokeStyle = `rgba(108, 204, 255, ${alpha * 0.3})`;
-        ctx.lineWidth = 1;
-        const prevX = 80 + (w - 160) * ((i-1) / Math.max(history.length - 1, 1));
-        ctx.beginPath();
-        ctx.moveTo(prevX, y);
-        ctx.lineTo(x, y);
-        ctx.stroke();
-      }
-    });
-
-       });
-    
-    // ─── aktuelles Symbol zeichnen ─────────────────────────────
-    const symbol = ORBIT[state.index] || '?';
-    ctx.fillStyle = '#6cf';
-    ctx.font = '48px Consolas';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(symbol, w / 2, h / 2);
-  }
-
-  // ─── Orbit‑Schritt ───────────────────────────────────────────
-  function stepOrbit() {
-    state.index = (state.index + 1) % ORBIT.length;
-    state.history.push(state.index);
-
-    const symbol = ORBIT[state.index];
-    const axiom = AXIOM_MAP[symbol] || 'NONE';
-
-    state.axiomCount[axiom] = (state.axiomCount[axiom] || 0) + 1;
-
-    document.getElementById('axiomIQQ').textContent = state.axiomCount.IQQ;
-    document.getElementById('axiomOCTA').textContent = state.axiomCount.OCTA;
-    document.getElementById('axiomA81').textContent = state.axiomCount.A81;
-
-    drawOrbit();
-  }
-
-  // ─── Animation ───────────────────────────────────────────────
-  function loop() {
-    if (state.running) stepOrbit();
-    state.timer = setTimeout(loop, 1000 / state.speed);
-  }
-
-  loop();
-
-  // ─── Buttons ─────────────────────────────────────────────────
-  document.getElementById('btnPlay').onclick = () => {
-    state.running = !state.running;
-    document.getElementById('btnPlay').textContent = state.running ? '⏸ Pause' : '▶ Start';
-  };
-
-  document.getElementById('btnStep').onclick = () => {
-    stepOrbit();
-  };
-
-  document.getElementById('btnReset').onclick = () => {
-    state.index = 0;
-    state.history = [];
-    state.axiomCount = { IQQ: 0, OCTA: 0, A81: 0 };
-    drawOrbit();
-  };
-
-  document.getElementById('speedSlider').oninput = (e) => {
-    state.speed = Number(e.target.value);
-    document.getElementById('speedLabel').textContent = state.speed + '×';
-  };
-
-</script>
-</body>
-</html>
+  const history = state.history.slice(-5);
+  history.forEach((idx, i) => {
+    const alpha = 0.1 + (i / history.length) * 0.3;
+    const x = 80 + (w - 160) * (i / Math.max(history.length - 1, 1));
+    const y = h - 30;
+    ctx.fillStyle =
