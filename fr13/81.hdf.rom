@@ -1,1 +1,61 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>MIR · Spiegel-/Betrachtungsebene</title>
+<style>
+body{
+  background:#000;
+  color:#0f0;
+  font-family:monospace;
+  padding:20px;
+}
+pre{
+  background:#111;
+  padding:20px;
+  border:1px solid #333;
+  white-space:pre-wrap;
+}
+h2{
+  color:#6cf;
+}
+</style>
+</head>
 
+<body>
+
+<h2>MIR · Spiegel-/Betrachtungsebene</h2>
+
+<pre>
+ID: MIR-01
+ROLE: mirror-layer
+
+DIMENSION:
+  Ebene: 10
+  Funktion: Spiegelung, Betrachtung, Analyse
+  Bindung: Beobachtet alle ULRM-Module und NC-Formen
+
+DATA:
+  input: LAGE
+  effect: "Spiegelung von x, y, z"
+  modi: "MIR"
+
+ENGINE:
+  function MIR(LAGE){
+      return {
+          x: -LAGE.x,
+          y: -LAGE.y,
+          z: -LAGE.z,
+          ghost: LAGE.ghost ?? null,
+          modi: "MIR",
+          role: "mirror-layer"
+      };
+  }
+
+RESULT:
+  MIR erzeugt eine vollständige Spiegelung der LAGE.
+  Die Betrachtungsebene zeigt die invertierten Koordinaten.
+</pre>
+
+</body>
+</html>
