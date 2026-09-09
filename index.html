@@ -6,7 +6,8 @@
 
 <style>
     body { background:#0b0b0b; color:#e0e0e0; font-family:Consolas; padding:20px; }
-    h1 { color:#6cf; }
+    h1 { color:#6cf; } /* Paradoxon-Marker */
+
     .container { max-width:900px; margin:0 auto; }
     .flex { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin:6px 0; }
     #orbitCanvas { background:#000; border:1px solid #333; display:block; margin:6px 0; }
@@ -26,11 +27,19 @@
     .badge.pause { border-color:#f0d080; color:#f0d080; }
 </style>
 </head>
+
 <body>
 
 <div class="container">
 
-<h1>IKI1UC · Axiom‑Orbit‑System <span style="color:#5a7a8a;font-size:14px;font-weight:300;">v2 — stabil · interaktiv · synchron</span></h1>
+<h1>IKI1UC · Axiom‑Orbit‑System 
+    <span style="color:#5a7a8a;font-size:14px;font-weight:300;">
+        v2 — stabil · interaktiv · synchron
+    </span>
+</h1>
+
+<!-- KORREKTE POSITION -->
+<div id="PARADOXON" data-name="RAWATOR-⅓"></div>
 
 <!-- STATUS -->
 <div class="flex" style="justify-content:space-between;">
@@ -66,6 +75,7 @@
 <div id="log">System geladen · Orbit v2</div>
 
 </div>
+
 
 <script>
 "use strict";
@@ -172,208 +182,64 @@
       }
     });
 
-    // ─── Hauptsymbol ──────────────────────────────────────────
+       });
+    
+    // ─── aktuelles Symbol zeichnen ─────────────────────────────
     const symbol = ORBIT[state.index] || '?';
     ctx.fillStyle = '#6cf';
-    ctx.font = '60px Consolas';
+    ctx.font = '48px Consolas';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.shadowColor = '#6cf';
-    ctx.shadowBlur = 20;
-    ctx.fillText(symbol, w/2, h/2 - 20);
-    ctx.shadowBlur = 0;
-
-    // ─── Index + Axiom‑Info ──────────────────────────────────
-    const axiom = AXIOM_MAP[symbol] || '—';
-    ctx.fillStyle = '#5a7a8a';
-    ctx.font = '14px Consolas';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
-    ctx.fillText(`#${state.index} · ${axiom}`, w/2, h/2 + 40);
-
-    // ─── Geschwindigkeit + Modus ─────────────────────────────
-    ctx.fillStyle = '#3a4a5a';
-    ctx.font = '11px Consolas';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'bottom';
-    ctx.fillText(`⏩ ${state.speed}× · ${state.mode}`, 12, h - 6);
-    ctx.textAlign = 'right';
-    ctx.fillText(`Symbol ${state.index+1}/${ORBIT.length}`, w - 12, h - 6);
+    ctx.fillText(symbol, w / 2, h / 2);
   }
 
-  // ─── ORBIT‑STEP ──────────────────────────────────────────────
+  // ─── Orbit‑Schritt ───────────────────────────────────────────
   function stepOrbit() {
-    // Sicherer Index
-    const next = (state.index + 1) % ORBIT.length;
-    state.index = next;
+    state.index = (state.index + 1) % ORBIT.length;
+    state.history.push(state.index);
 
-    // History pflegen
-    state.history.push(next);
-    if (state.history.length > 10) state.history.shift();
+    const symbol = ORBIT[state.index];
+    const axiom = AXIOM_MAP[symbol] || 'NONE';
 
-    // Axiom‑Zählung
-    const sym = ORBIT[next];
-    const axiom = AXIOM_MAP[sym] || null;
-    if (axiom && state.mode === axiom) {
-      state.axiomCount[axiom] = (state.axiomCount[axiom] || 0) + 1;
-    }
+    state.axiomCount[axiom] = (state.axiomCount[axiom] || 0) + 1;
+
+    document.getElementById('axiomIQQ').textContent = state.axiomCount.IQQ;
+    document.getElementById('axiomOCTA').textContent = state.axiomCount.OCTA;
+    document.getElementById('axiomA81').textContent = state.axiomCount.A81;
 
     drawOrbit();
-    log(`Orbit‑Schritt → ${sym} (${axiom || '—'})`);
-
-    // Sync: BroadcastChannel
-    try {
-      const bc = new BroadcastChannel('iki1uc-orbit');
-      bc.postMessage({ type: 'orbit.step', index: state.index, symbol: sym });
-      bc.close();
-    } catch (_) {}
   }
 
-  // ─── PLAY/PAUSE ──────────────────────────────────────────────
-  function togglePlay() {
+  // ─── Animation ───────────────────────────────────────────────
+  function loop() {
+    if (state.running) stepOrbit();
+    state.timer = setTimeout(loop, 1000 / state.speed);
+  }
+
+  loop();
+
+  // ─── Buttons ─────────────────────────────────────────────────
+  document.getElementById('btnPlay').onclick = () => {
     state.running = !state.running;
     document.getElementById('btnPlay').textContent = state.running ? '⏸ Pause' : '▶ Start';
-    document.getElementById('orbitStatus').textContent = state.running ? 'AKTIV' : 'PAUSE';
-    document.getElementById('orbitStatus').className = 'badge ' + (state.running ? 'aktiv' : 'pause');
-    if (state.running) {
-      startLoop();
-    } else {
-      clearInterval(state.timer);
-      state.timer = null;
-    }
-  }
+  };
 
-  function startLoop() {
-    if (state.timer) clearInterval(state.timer);
-    const interval = Math.max(100, 800 - state.speed * 60);
-    state.timer = setInterval(() => {
-      if (state.running) stepOrbit();
-    }, interval);
-  }
+  document.getElementById('btnStep').onclick = () => {
+    stepOrbit();
+  };
 
-  // ─── RESET ────────────────────────────────────────────────────
-  function resetOrbit() {
+  document.getElementById('btnReset').onclick = () => {
     state.index = 0;
     state.history = [];
     state.axiomCount = { IQQ: 0, OCTA: 0, A81: 0 };
     drawOrbit();
-    log('⟲ Orbit zurückgesetzt');
-    // Sync
-    try {
-      const bc = new BroadcastChannel('iki1uc-orbit');
-      bc.postMessage({ type: 'orbit.reset' });
-      bc.close();
-    } catch (_) {}
-  }
+  };
 
-  // ─── MODUS-UMSCHALTUNG ──────────────────────────────────────
-  function setMode(mode) {
-    state.mode = mode;
-    document.querySelectorAll('[id^="btnMode"]').forEach(b => b.classList.remove('active'));
-    const btn = document.getElementById('btnMode' + mode);
-    if (btn) btn.classList.add('active');
-    log(`🌀 Modus gewechselt: ${mode}`);
-  }
+  document.getElementById('speedSlider').oninput = (e) => {
+    state.speed = Number(e.target.value);
+    document.getElementById('speedLabel').textContent = state.speed + '×';
+  };
 
-  // ─── LOG ──────────────────────────────────────────────────────
-  function log(msg) {
-    const logBox = document.getElementById('log');
-    const time = new Date().toLocaleTimeString();
-    logBox.innerHTML += `<br>[${time}] ${msg}`;
-    logBox.scrollTop = logBox.scrollHeight;
-    if (logBox.children.length > 80) logBox.removeChild(logBox.firstChild);
-  }
-
-  // ─── SYNCHRONISATION (BroadcastChannel) ──────────────────────
-  function initSync() {
-    try {
-      const bc = new BroadcastChannel('iki1uc-orbit');
-      bc.onmessage = (e) => {
-        const data = e.data;
-        if (data.type === 'orbit.step') {
-          state.index = data.index;
-          state.history.push(data.index);
-          if (state.history.length > 10) state.history.shift();
-          drawOrbit();
-          log(`📡 Sync‑Schritt von anderem Tab: ${data.symbol}`);
-          document.getElementById('syncStatus').textContent = '● synchronisiert';
-          document.getElementById('syncStatus').className = 'ok';
-        }
-        if (data.type === 'orbit.reset') {
-          state.index = 0;
-          state.history = [];
-          drawOrbit();
-          log('📡 Sync‑Reset von anderem Tab');
-        }
-      };
-      // Nach 2 Sekunden Verbindungsstatus aktualisieren
-      setTimeout(() => {
-        document.getElementById('syncStatus').textContent = '● verbunden';
-        document.getElementById('syncStatus').className = 'ok';
-      }, 500);
-    } catch (_) {
-      document.getElementById('syncStatus').textContent = '○ kein BroadcastChannel';
-      document.getElementById('syncStatus').className = 'err';
-    }
-  }
-
-  // ─── EVENTS ────────────────────────────────────────────────────
-  document.getElementById('btnPlay').addEventListener('click', togglePlay);
-  document.getElementById('btnStep').addEventListener('click', stepOrbit);
-  document.getElementById('btnReset').addEventListener('click', resetOrbit);
-
-  document.getElementById('btnModeIQQ').addEventListener('click', () => setMode('IQQ'));
-  document.getElementById('btnModeOCTA').addEventListener('click', () => setMode('OCTA'));
-  document.getElementById('btnModeA81').addEventListener('click', () => setMode('A81'));
-
-  const speedSlider = document.getElementById('speedSlider');
-  const speedLabel = document.getElementById('speedLabel');
-  speedSlider.addEventListener('input', () => {
-    state.speed = parseInt(speedSlider.value, 10);
-    speedLabel.textContent = state.speed + '×';
-    if (state.running) startLoop();
-  });
-
-  // ─── TASTATUR ──────────────────────────────────────────────────
-  document.addEventListener('keydown', (e) => {
-    if (e.key === ' ') { e.preventDefault(); togglePlay(); }
-    if (e.key === 'ArrowRight') stepOrbit();
-    if (e.key === 'r' || e.key === 'R') resetOrbit();
-    if (e.key === '1') setMode('IQQ');
-    if (e.key === '2') setMode('OCTA');
-    if (e.key === '3') setMode('A81');
-  });
-
-  // ─── INIT ──────────────────────────────────────────────────────
-  function init() {
-    // Module initialisieren (simuliert)
-    log('🧠 Module geladen: ' + loaded.length);
-    log('⚡ Axiom‑Orbit‑System v2 gestartet');
-
-    // Standard‑Modus aktivieren
-    setMode('IQQ');
-
-    // Sync starten
-    initSync();
-
-    // Ersten Schritt zeichnen
-    state.history.push(0);
-    drawOrbit();
-
-    // Automatischen Lauf starten
-    startLoop();
-
-    // Log‑Begrüßung
-    log('⌨️  Leertaste=Pause  →=Schritt  r=Reset  1=IQQ  2=OCTA  3=A81');
-  }
-
-  // Fehlerbehandlung für fehlende Module simulieren
-  window.addEventListener('error', (e) => {
-    log('⚠️ Modul-Fehler: ' + e.message);
-  }, true);
-
-  init();
 </script>
-
 </body>
 </html>
