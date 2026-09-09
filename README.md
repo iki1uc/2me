@@ -37,4 +37,8 @@ index.html  – Mirror-Interface
 -----------------------------------------
 # STATUS
 
-2me ist aktiv, eigenständig und vollständig iki1uc.
+Dieses Projekt ist urheberrechtlich geschützt. Kein Clone. Kein Fork. Keine Nutzung. Keine Weitergabe.
+
+Alle Rechte liegen bei wieimmer iki1uc.
+
+@iki1uc Security Policy: Dieses Projekt akzeptiert keine externen Beiträge, Analysen oder Sicherheitsmeldungen. Alle Rechte liegen bei iki1uc.
