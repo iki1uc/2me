@@ -1,1 +1,52 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>PI – Kreis / Verhältnis</title>
+<style>
+body { background:#000; color:#0ff; font-family:monospace; padding:20px; }
+pre  { background:#111; padding:20px; border:1px solid #333; color:#0ff; }
+h2   { color:#6cf; }
+</style>
+</head>
 
+<body>
+
+<h2>PI – Kreis / Verhältnis</h2>
+
+<pre>
+ID: ULRM-PI
+ROLE: ratio
+MODE: RAW / RESPO / Argumenteria
+STATUS: active
+
+DATA:
+  pi: 3.1415926535
+  relation: "Umfang / Durchmesser"
+  effect: "rotierende Lage"
+  respo: "Führung durch Kreisverhältnis"
+  modi: "Y (rotate)"
+  cube: "circle-face"
+  rawator: "spin"
+  mir: "Rotation sichtbar"
+  pimp: "Betrachtung: Kreis"
+
+ENGINE:
+  function ULRM_PI(LAGE){
+      const angle = (LAGE.angle ?? 0) + 3.1415926535;
+      return {
+          x: Math.cos(angle),
+          y: Math.sin(angle),
+          z: LAGE.z,
+          angle: angle,
+          modi: "PI",
+          role: "ratio"
+      };
+  }
+
+RESULT:
+  LAGE rotiert proportional zum Kreisverhältnis (PI).
+</pre>
+
+</body>
+</html>
