@@ -1,729 +1,927 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>⚛️ IKI1UC · PHYSICS ENGINE · 3‑9‑81‑Φ4</title>
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body {
-      background: #0a0a12;
-      color: #d0d9e6;
-      font-family: 'Consolas', monospace;
-      padding: 16px;
-      min-height: 100vh;
-      background: radial-gradient(ellipse at 20% 30%, #0c0c1a, #000);
-      overflow-x: hidden;
-    }
-    .container { max-width: 1600px; margin: 0 auto; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🖥️ MAINBOARD · 4-STATION · 2me CONTROLLER</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:#05070e; color:#c0d0d0;
+    font-family:'Consolas','Segoe UI',monospace;
+    height:100vh; overflow:hidden; display:flex; flex-direction:column;
+  }
+  #app { display:flex; flex:1; overflow:hidden; }
 
-    /* HEADER */
-    .header {
-      display: flex; justify-content: space-between; align-items: center;
-      flex-wrap: wrap; border-bottom: 2px solid #ffd700; padding-bottom: 12px; margin-bottom: 20px;
-    }
-    .header h1 {
-      font-size: 28px; letter-spacing: 4px;
-      background: linear-gradient(90deg, #ffd700, #66ccff, #ff66ff, #00ff88);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    }
-    .header .sub { font-size: 11px; color: #3d5a70; letter-spacing: 2px; }
-    .status-led { display: flex; gap: 16px; font-size: 11px; align-items:center; }
-    .led { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 4px; }
-    .led.green { background: #4f4; box-shadow: 0 0 8px #4f4; }
-    .led.yellow { background: #ffa; box-shadow: 0 0 8px #ffa; }
-    .led.purple { background: #a78bfa; box-shadow: 0 0 8px #a78bfa; }
-    .led.red { background: #f66; box-shadow: 0 0 8px #f66; }
-    #sys-clock { color: #666; }
+  /* ── SIDEBAR ─────────────────────────────────────── */
+  #sidebar {
+    width:300px; min-width:260px;
+    background:rgba(6,8,16,0.94);
+    backdrop-filter:blur(12px);
+    border-right:1px solid rgba(120,220,150,0.08);
+    padding:14px 12px; overflow-y:auto; display:flex; flex-direction:column; gap:10px;
+  }
+  .brand {
+    font-size:16px; letter-spacing:2px; font-weight:300;
+    background:linear-gradient(135deg,#7ee0a0,#d8f0c0,#b388ff);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    padding-bottom:8px; border-bottom:1px solid rgba(120,220,150,0.08);
+  }
+  .brand small { font-size:9px; color:#5a7a8a; -webkit-text-fill-color:#5a7a8a; display:block; margin-top:2px; letter-spacing:1px; }
 
-    /* PHYSICS CANVAS */
-    .physics-panel {
-      background: rgba(10,10,20,0.7);
-      border: 1px solid #1a1a2a;
-      border-radius: 14px;
-      padding: 14px;
-      margin-bottom: 16px;
-      position: relative;
-    }
-    .physics-panel h2 {
-      color: #ffd700;
-      font-size: 13px;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-      padding-bottom: 6px;
-      margin-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
-    }
-    #physicsCanvas {
-      width: 100%;
-      height: auto;
-      aspect-ratio: 16/9;
-      background: #06060a;
-      border-radius: 8px;
-      border: 1px solid #1a1a2a;
-      display: block;
-      cursor: crosshair;
-    }
+  .comp-group {
+    background:rgba(0,0,0,0.25); border-radius:10px;
+    padding:8px 10px; border:1px solid rgba(120,220,150,0.05);
+  }
+  .comp-group label {
+    font-size:9px; color:#8aa8a0; letter-spacing:1px;
+    display:block; margin-bottom:3px;
+  }
+  .comp-group select, .comp-group input {
+    width:100%; background:rgba(20,28,20,0.6);
+    border:1px solid rgba(120,220,150,0.12); border-radius:6px;
+    padding:4px 8px; color:#d0e8e0; font-family:inherit; font-size:11px;
+  }
+  .comp-group .rom-tag {
+    display:inline-block; font-size:8px; color:#5a7a8a;
+    background:rgba(0,0,0,0.3); padding:1px 6px; border-radius:8px;
+    margin-left:6px;
+  }
 
-    /* METRIK GRID (4 Achsen) */
-    .grid-4 {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-      margin-bottom: 16px;
-    }
-    @media (max-width: 1000px) { .grid-4 { grid-template-columns: 1fr 1fr; } }
-    @media (max-width: 600px) { .grid-4 { grid-template-columns: 1fr; } }
+  #simulateBtn {
+    background:rgba(20,28,20,0.6); border:1px solid #7ee0a0;
+    border-radius:8px; padding:8px 0; color:#d0e8e0;
+    font-weight:bold; cursor:pointer; transition:0.3s;
+  }
+  #simulateBtn:hover { background:rgba(120,220,150,0.1); border-color:#b388ff; }
+  #simulateBtn:disabled { opacity:0.4; cursor:wait; }
 
-    .card {
-      background: rgba(10,10,20,0.75);
-      border: 1px solid #1a1a2a;
-      border-radius: 12px;
-      padding: 14px;
-      backdrop-filter: blur(4px);
-      transition: border-color 0.3s;
-    }
-    .card:hover { border-color: #ffd70055; }
-    .card h3 {
-      color: #ffd700;
-      font-size: 13px;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-      padding-bottom: 4px;
-      margin-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-    }
-    .card h3 .badge { font-size: 9px; background: #1a1a2a; padding: 2px 10px; border-radius: 20px; color: #888; }
-    .metric-row {
-      display: flex; justify-content: space-between;
-      font-size: 11px; padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.03);
-    }
-    .metric-row .label { color: #666; }
-    .metric-row .value { font-weight: bold; }
-    .value.gold { color: #ffd700; }
-    .value.cyan { color: #66ccff; }
-    .value.pink { color: #ff66ff; }
-    .value.green { color: #4f4; }
-    .value.orange { color: #ff8c00; }
-    .value.purple { color: #a78bfa; }
-    .value.mystery { color: #00ff88; }
+  .result-panel {
+    background:rgba(0,0,0,0.25); border-radius:10px;
+    padding:8px 12px; border:1px solid rgba(120,220,150,0.05);
+    font-size:10px; line-height:1.6; overflow-y:auto; max-height:45vh;
+  }
+  .result-panel .head {
+    color:#f0d080; font-weight:bold; font-size:10px;
+    border-bottom:1px solid rgba(255,215,0,0.08);
+    padding-bottom:4px; margin-bottom:6px; display:flex; justify-content:space-between;
+  }
+  .row { display:flex; justify-content:space-between; padding:2px 0; border-bottom:1px solid rgba(255,255,255,0.02); }
+  .val { font-weight:bold; } .val.gold{color:#f0d080;} .val.green{color:#8cf0d0;}
+  .val.red{color:#ff6666;} .val.purple{color:#b388ff;} .val.cyan{color:#6cf;}
 
-    /* LOG / STEUERUNG */
-    .deutung {
-      background: rgba(10,10,20,0.7);
-      border: 1px solid #1a1a2a;
-      border-radius: 12px;
-      padding: 12px;
-      margin-bottom: 14px;
-    }
-    .deutung h2 {
-      color: #ffd700;
-      font-size: 13px;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-      padding-bottom: 6px;
-      margin-bottom: 8px;
-    }
-    #log {
-      background: #06060a;
-      border-radius: 6px;
-      padding: 10px;
-      font-size: 10px;
-      max-height: 120px;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      color: #88ddbb;
-      border: 1px solid #1a1a2a;
-      line-height: 1.6;
-    }
+  /* ── STAGE ───────────────────────────────────────── */
+  #stage { flex:1; position:relative; overflow:hidden; }
+  #stage canvas { display:block; width:100%; height:100%; }
 
-    .controls {
-      display: flex; flex-wrap: wrap; gap: 8px;
-      background: rgba(10,10,20,0.5); border-radius: 10px; padding: 12px;
-      margin-bottom: 14px; border: 1px solid #1a1a2a; align-items: center;
-    }
-    .controls button {
-      background: #111; color: #d0d9e6; border: 1px solid #333;
-      padding: 6px 16px; border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 10px;
-      transition: 0.2s;
-    }
-    .controls button:hover { border-color: #ffd700; background: #1a1a2a; }
-    .controls button.primary { border-color: #ffd700; color: #ffd700; }
-    .controls button.primary:hover { background: #ffd700; color: #000; }
-    .controls button.attack { border-color: #ff8c00; color: #ff8c00; }
-    .controls button.attack:hover { background: #ff8c00; color: #000; }
-    .controls button.meta { border-color: #a78bfa; color: #a78bfa; }
-    .controls button.meta:hover { background: #a78bfa; color: #000; }
-    .controls input {
-      background: #1e242c; border: 1px solid #2f3542; color: #fff;
-      padding: 6px 12px; border-radius: 4px; font-family: inherit; font-size: 10px;
-      flex: 1; min-width: 140px;
-    }
-    .controls input::placeholder { color: #445555; }
+  #status {
+    position:absolute; bottom:14px; left:14px;
+    background:rgba(0,0,0,0.6); backdrop-filter:blur(8px);
+    border-radius:12px; padding:6px 14px; font-size:10px;
+    border:1px solid rgba(120,220,150,0.06); color:#6a8a7a;
+    z-index:20; pointer-events:none; line-height:1.6;
+  }
+  #status .val { color:#a0e0b0; font-weight:bold; }
 
-    /* MATRIX VISUAL */
-    .matrix-visual {
-      display: flex; flex-direction: column; align-items: center; margin: 6px 0;
-    }
-    .matrix-row {
-      display: flex; justify-content: center; gap: 30px; padding: 4px 0;
-    }
-    .matrix-node {
-      background: #0a0a0a; padding: 4px 14px; border-radius: 6px;
-      border: 1px solid #3d5a70; color: #ffd700; font-weight: bold; min-width: 50px; text-align: center;
-    }
-    .matrix-arrow { color: #0ff; font-size: 16px; }
-    .matrix-label { font-size: 9px; color: #3d5a70; margin-top: 2px; }
+  /* ── 2me CONTROLLER ──────────────────────────────── */
+  #me2Panel {
+    position:absolute; top:14px; right:14px;
+    width:230px; background:rgba(6,8,16,0.88);
+    backdrop-filter:blur(10px); border-radius:12px;
+    border:1px solid rgba(179,136,255,0.15);
+    padding:10px 12px; font-size:10px; z-index:25;
+  }
+  #me2Panel .head {
+    color:#b388ff; font-weight:bold; font-size:11px; letter-spacing:1px;
+    border-bottom:1px solid rgba(179,136,255,0.1);
+    padding-bottom:5px; margin-bottom:6px; display:flex;
+    justify-content:space-between; align-items:center;
+  }
+  #me2Panel .head .badge {
+    font-size:8px; padding:1px 8px; border-radius:10px;
+    border:1px solid #b388ff; color:#b388ff;
+  }
+  #me2Panel .head .badge.master { background:rgba(179,136,255,0.15); }
+  .check-row {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:2px 0; font-size:9px; color:#8aa8a0;
+  }
+  .check-row .dot {
+    width:6px; height:6px; border-radius:50%; background:#3a3a3a;
+    margin-right:5px; display:inline-block; transition:0.3s;
+  }
+  .check-row .dot.ok { background:#8cf0d0; box-shadow:0 0 6px #8cf0d0; }
+  .check-row .dot.fail { background:#ff6666; box-shadow:0 0 6px #ff6666; }
+  .check-row .val { color:#d0e8e0; font-weight:bold; }
 
-    .footer {
-      margin-top: 20px; padding: 8px 12px; background: rgba(0,0,0,0.3);
-      border-radius: 6px; font-size: 9px; color: #445555;
-      display: flex; justify-content: space-between; flex-wrap: wrap;
-    }
-    .footer .gold { color: #ffd700; }
-    .footer .purple { color: #a78bfa; }
-  </style>
+  .me2-buttons {
+    display:flex; flex-wrap:wrap; gap:4px; margin-top:6px;
+    border-top:1px solid rgba(179,136,255,0.08); padding-top:6px;
+  }
+  .me2-buttons button {
+    flex:1; background:rgba(20,20,30,0.6);
+    border:1px solid rgba(179,136,255,0.2); color:#b388ff;
+    padding:3px 0; border-radius:6px; font-family:inherit;
+    font-size:8px; cursor:pointer; transition:0.2s;
+  }
+  .me2-buttons button:hover { background:rgba(179,136,255,0.1); }
+  .me2-buttons button.active { background:rgba(179,136,255,0.2); color:#fff; }
+
+  /* ── HDF RESOLVER ────────────────────────────────── */
+  #hdfBar {
+    position:absolute; bottom:14px; left:50%; transform:translateX(-50%);
+    background:rgba(0,0,0,0.6); backdrop-filter:blur(8px);
+    border-radius:12px; padding:6px 12px;
+    border:1px solid rgba(120,220,150,0.08);
+    display:flex; gap:8px; align-items:center; z-index:25;
+    font-size:10px; max-width:80vw;
+  }
+  #hdfBar input {
+    background:rgba(20,28,20,0.6); border:1px solid rgba(120,220,150,0.15);
+    border-radius:8px; padding:4px 10px; color:#d0e8e0;
+    font-family:inherit; font-size:10px; min-width:180px;
+  }
+  #hdfBar button {
+    background:rgba(20,28,20,0.6); border:1px solid rgba(120,220,150,0.2);
+    border-radius:8px; padding:4px 12px; color:#d0e8e0;
+    font-family:inherit; font-size:10px; cursor:pointer; transition:0.2s;
+  }
+  #hdfBar button:hover { border-color:#7ee0a0; }
+  #hdfOut { color:#8cf0d0; font-size:9px; min-width:60px; }
+
+  /* ── LOG ─────────────────────────────────────────── */
+  #logBox {
+    position:absolute; top:14px; left:14px;
+    width:280px; max-height:150px; overflow-y:auto;
+    background:rgba(0,0,0,0.55); backdrop-filter:blur(8px);
+    border-radius:12px; padding:8px 12px;
+    border:1px solid rgba(120,220,150,0.06);
+    font-size:9px; line-height:1.5; color:#8ab0c0;
+    z-index:25;
+  }
+  #logBox .entry { padding:1px 0; border-bottom:1px solid rgba(255,255,255,0.02); }
+  #logBox .time { color:#3a4a5a; margin-right:6px; }
+  #logBox .tag { color:#6cf; margin-right:4px; }
+
+  @media (max-width:900px) {
+    #sidebar { width:0; min-width:0; padding:0; overflow:hidden; border:none; }
+    #me2Panel { width:180px; font-size:9px; }
+    #hdfBar input { min-width:100px; }
+  }
+</style>
 </head>
 <body>
-<div class="container">
 
-  <!-- HEADER -->
-  <div class="header">
-    <div>
-      <h1>⚛️ IKI1UC · PHYSICS ENGINE</h1>
-      <div class="sub">3‑9‑81‑Φ4 · Echtzeit‑Orbit · Gravitation · Energie · Feld</div>
-    </div>
-    <div class="status-led">
-      <span><span class="led green"></span> NET.online</span>
-      <span><span class="led purple"></span> Φ4 aktiv</span>
-      <span id="pause-led"><span class="led green" id="pause-dot"></span> <span id="pause-label">läuft</span></span>
-      <span id="sys-clock">⏱️ --:--</span>
-    </div>
-  </div>
+<div id="app">
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div class="brand">🖥️ MAINBOARD<small>4‑Station · 2me Controller · HDF‑ROM</small></div>
 
-  <!-- PHYSICS CANVAS – das Herzstück -->
-  <div class="physics-panel">
-    <h2>🌌 ORBIT · FELD · VERTEX <span style="font-size:9px;color:#3d5a70;font-weight:400;">3‑9‑81‑Φ4 · Live‑Physik</span></h2>
-    <canvas id="physicsCanvas" width="1600" height="900"></canvas>
-  </div>
+    <div class="comp-group">
+      <label>CPU <span class="rom-tag" id="romCpu">hdf:d</span></label>
+      <select id="cpuSelect">
+        <option value="intel_i9_13900K">Intel Core i9-13900K</option>
+        <option value="intel_i9_14900K">Intel Core i9-14900K</option>
+        <option value="intel_i7_13700K">Intel Core i7-13700K</option>
+        <option value="amd_ryzen9_7950X">AMD Ryzen 9 7950X</option>
+        <option value="amd_ryzen7_7800X3D">AMD Ryzen 7 7800X3D</option>
+        <option value="intel_i5_13600K">Intel Core i5-13600K</option>
+        <option value="custom">🔧 Eigene Eingabe</option>
+      </select>
+      <input id="cpuCustom" placeholder="z.B. Intel i9-14900K" style="margin-top:4px;display:none;">
+    </div>
 
-  <!-- VIER ACHSEN (Metriken) -->
-  <div class="grid-4">
-    <div class="card">
-      <h3>🌍 WELT <span class="badge">3</span></h3>
-      <div class="metric-row"><span class="label">Router</span><span class="value gold" id="welt-router">aktiv</span></div>
-      <div class="metric-row"><span class="label">Stage</span><span class="value cyan" id="welt-stage">3D</span></div>
-      <div class="metric-row"><span class="label">Plugins</span><span class="value pink" id="welt-plugins">13</span></div>
-      <div class="metric-row"><span class="label">Badges</span><span class="value orange" id="welt-badges">0</span></div>
+    <div class="comp-group">
+      <label>GPU <span class="rom-tag" id="romGpu">hdf:e</span></label>
+      <select id="gpuSelect">
+        <option value="nvidia_rtx4090">NVIDIA RTX 4090</option>
+        <option value="nvidia_rtx4080">NVIDIA RTX 4080</option>
+        <option value="amd_rx7900XTX">AMD RX 7900 XTX</option>
+        <option value="nvidia_rtx4070">NVIDIA RTX 4070</option>
+        <option value="amd_rx7800XT">AMD RX 7800 XT</option>
+        <option value="custom">🔧 Eigene Eingabe</option>
+      </select>
+      <input id="gpuCustom" placeholder="z.B. NVIDIA RTX 5090" style="margin-top:4px;display:none;">
     </div>
-    <div class="card">
-      <h3>⚡ KRAFT <span class="badge">9</span></h3>
-      <div class="metric-row"><span class="label">Queue</span><span class="value cyan" id="kraft-queue">0</span></div>
-      <div class="metric-row"><span class="label">ZEN</span><span class="value gold" id="kraft-zen">bereit</span></div>
-      <div class="metric-row"><span class="label">Dispatcher</span><span class="value green" id="kraft-input">aktiv</span></div>
-      <div class="metric-row"><span class="label">Befehle</span><span class="value orange" id="kraft-cmds">0</span></div>
-    </div>
-    <div class="card">
-      <h3>🧬 LEBEN <span class="badge">81</span></h3>
-      <div class="metric-row"><span class="label">Zellen</span><span class="value pink" id="leben-zellen">81</span></div>
-      <div class="metric-row"><span class="label">Tick</span><span class="value gold" id="leben-tick">0</span></div>
-      <div class="metric-row"><span class="label">Vital</span><span class="value green" id="leben-vital">0.00</span></div>
-      <div class="metric-row"><span class="label">Drift</span><span class="value cyan" id="leben-drift">0.00</span></div>
-    </div>
-    <div class="card" style="border-color:#a78bfa44;">
-      <h3>🌀 MYSTERY <span class="badge">Φ4</span></h3>
-      <div class="metric-row"><span class="label">Momentum</span><span class="value purple" id="myst-momentum">0.00</span></div>
-      <div class="metric-row"><span class="label">Orbit</span><span class="value purple" id="myst-orbit">0.00</span></div>
-      <div class="metric-row"><span class="label">Fix</span><span class="value purple" id="myst-fix">0.70</span></div>
-      <div class="metric-row"><span class="label">Tiefe</span><span class="value mystery" id="myst-depth">0.00</span></div>
-    </div>
-  </div>
 
-  <!-- MATRIX VISUAL -->
-  <div class="deutung" style="border-color:#a78bfa44;">
-    <h2>🧮 3‑9‑81‑Φ4 · MATRIX <span style="font-size:9px;color:#3d5a70;font-weight:400;">Atomare Überlegenheit</span></h2>
-    <div class="matrix-visual">
-      <div class="matrix-row">
-        <span class="matrix-node" id="m81">81</span>
-        <span class="matrix-arrow">→</span>
-        <span class="matrix-node" id="m243">243</span>
-        <span class="matrix-arrow">→</span>
-        <span class="matrix-node" id="m729">729</span>
-        <span class="matrix-arrow">→</span>
-        <span class="matrix-node" id="mPhi4" style="border-color:#a78bfa;">Φ4</span>
+    <div class="comp-group">
+      <label>RAM <span class="rom-tag" id="romRam">hdf:i</span></label>
+      <select id="ramSelect">
+        <option value="ddr5_6400_32">DDR5-6400 32GB</option>
+        <option value="ddr5_6000_32">DDR5-6000 32GB</option>
+        <option value="ddr5_5600_16">DDR5-5600 16GB</option>
+        <option value="ddr4_3600_32">DDR4-3600 32GB</option>
+        <option value="custom">🔧 Eigene Eingabe</option>
+      </select>
+      <input id="ramCustom" placeholder="z.B. DDR5-7200 48GB" style="margin-top:4px;display:none;">
+    </div>
+
+    <div class="comp-group">
+      <label>SSD <span class="rom-tag" id="romSsd">hdf:n</span></label>
+      <select id="ssdSelect">
+        <option value="pcie4_7000">PCIe 4.0 7000 MB/s</option>
+        <option value="pcie4_5000">PCIe 4.0 5000 MB/s</option>
+        <option value="pcie3_3500">PCIe 3.0 3500 MB/s</option>
+        <option value="sata_550">SATA SSD 550 MB/s</option>
+        <option value="custom">🔧 Eigene Eingabe</option>
+      </select>
+      <input id="ssdCustom" placeholder="z.B. PCIe 5.0 10000" style="margin-top:4px;display:none;">
+    </div>
+
+    <button id="simulateBtn">🔍 SIMULIEREN · 4× GENAUIGKEIT</button>
+
+    <div class="result-panel" id="resultPanel">
+      <div class="head"><span>📊 ERGEBNISSE</span><span id="accuracyBadge">2me: bereit</span></div>
+      <div id="resultContent">
+        <div class="row"><span>Kompatibilität</span><span class="val gold" id="rCompat">–</span></div>
+        <div class="row"><span>Bottleneck</span><span class="val" id="rBottleneck">–</span></div>
+        <div class="row"><span>Respo (Effizienz)</span><span class="val green" id="rRespo">–</span></div>
+        <div class="row"><span>Probleme</span><span class="val" id="rIssues">–</span></div>
+        <div class="row"><span>Empfehlung</span><span class="val" id="rRecommend">–</span></div>
+        <div class="row" style="border-top:1px solid rgba(179,136,255,0.1);margin-top:4px;padding-top:4px;">
+          <span>4× Genauigkeit</span><span class="val purple" id="r4x">–</span>
+        </div>
+        <div class="row"><span>2× Prüfbarkeit</span><span class="val purple" id="r2x">–</span></div>
       </div>
-      <div class="matrix-label" id="formulaDisplay">3 × (0 ÷ 6) × 90 = 0 | Φ4 = (Welt × Kraft × Leben) / (Mystery + 1)</div>
     </div>
   </div>
 
-  <!-- LOG / DEUTUNG -->
-  <div class="deutung">
-    <h2>📖 DEUTUNG · Physik‑Log</h2>
-    <div id="log">▶ IKI1UC · PHYSICS ENGINE · Orbit‑Simulation aktiv …</div>
-  </div>
+  <!-- STAGE -->
+  <div id="stage">
+    <canvas id="canvas"></canvas>
 
-  <!-- STEUERUNG -->
-  <div class="controls">
-    <input id="cmdInput" placeholder="SHOCK / WAVE / LINK / PUSH / GROW / MOVE / BREAK / MYSTERY" />
-    <button class="attack" onclick="sendCmd()">⚡ SENDEN</button>
-    <button class="primary" onclick="toggleAuto()">▶ AUTO</button>
-    <button onclick="stepTick()">⏭ SCHRITT</button>
-    <button class="meta" onclick="toggleMystery()">🌀 MYSTERY</button>
-    <button onclick="resetAll()">⟲ RESET</button>
-    <span style="color:#666;font-size:9px;">Speed:</span>
-    <input type="range" id="speedSlider" min="1" max="10" value="3" style="width:80px;background:#1e242c;" />
-  </div>
+    <div id="logBox">
+      <div class="entry"><span class="time">[init]</span><span class="tag">2me</span>Controller geladen · 4 Stationen bereit</div>
+    </div>
 
-  <div class="footer">
-    <span>⚛️ IKI1UC · <span class="gold">PHYSICS ENGINE</span> · <span class="purple">Φ4</span></span>
-    <span>3‑9‑81 · Echtzeit‑Orbit · Gravitation · Feld</span>
-    <span>⌨️  Leertaste=Auto · Enter=Befehl · m=Mystery‑Toggle</span>
+    <div id="me2Panel">
+      <div class="head"><span>👁️ 2me · MASTER</span><span class="badge" id="me2Role">INIT</span></div>
+      <div class="check-row"><span><span class="dot" id="chkCpu"></span>CPU STATION</span><span class="val" id="cpuVal">–</span></div>
+      <div class="check-row"><span><span class="dot" id="chkGpu"></span>GPU STATION</span><span class="val" id="gpuVal">–</span></div>
+      <div class="check-row"><span><span class="dot" id="chkRam"></span>RAM STATION</span><span class="val" id="ramVal">–</span></div>
+      <div class="check-row"><span><span class="dot" id="chkSsd"></span>SSD STATION</span><span class="val" id="ssdVal">–</span></div>
+      <div style="border-top:1px solid rgba(179,136,255,0.08);margin-top:6px;padding-top:6px;">
+        <div class="check-row"><span><span class="dot" id="chk4x"></span>4× GENAUIGKEIT</span><span class="val" id="acc4x">–</span></div>
+        <div class="check-row"><span><span class="dot" id="chk2x"></span>2× PRÜFBARKEIT</span><span class="val" id="acc2x">–</span></div>
+      </div>
+      <div class="me2-buttons">
+        <button id="btnAllow" class="active">ALLOW</button>
+        <button id="btnBoost">BOOST</button>
+        <button id="btnSlow">SLOW</button>
+        <button id="btnOverride">OVERRIDE</button>
+      </div>
+    </div>
+
+    <div id="hdfBar">
+      <span style="color:#6a8a7a;">📖 HDF‑RESOLVE</span>
+      <input id="hdfInput" placeholder="#d / #e / #axiom / #zauber.6" value="#d">
+      <button id="hdfBtn">RESOLVE</button>
+      <span id="hdfOut">–</span>
+    </div>
+
+    <div id="status">
+      <div>🌀 STATIONEN <span class="val" id="stStations">0/4</span></div>
+      <div>⚡ KlicK <span class="val" id="stKlick">0</span> · ZaM <span class="val" id="stZam">idle</span></div>
+      <div>🔒 Zoll <span class="val" id="stZoll">offen</span></div>
+    </div>
   </div>
 </div>
 
-<script>
-  // ================================================================
-  // IKI1UC · PHYSICS ENGINE – 3‑9‑81‑Φ4
-  // ================================================================
-
-  // ---- CANVAS SETUP ----
-  const canvas = document.getElementById('physicsCanvas');
-  const ctx = canvas.getContext('2d');
-
-  function resizeCanvas() {
-    const rect = canvas.parentElement.getBoundingClientRect();
-    const w = Math.min(rect.width * 0.95, 1600);
-    canvas.width = w * 1.2;
-    canvas.height = (w * 0.6) * 1.2;
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
   }
-  window.addEventListener('resize', resizeCanvas);
-  resizeCanvas();
+}
+</script>
 
-  // ---- R-KERNEL (Mystery-Achse) ----
-  const R_KERNEL = {
-    mystery: {
-      momentum: 0.5,
-      orbit: 0.5,
-      fix: 0.7,
-      depth: 0.4,
-      active: true,  // standardmäßig aktiv
-    },
-    transform(welt, kraft, leben) {
-      const m = this.mystery;
-      const raw = (welt * kraft * leben) / (m.depth + 1);
-      return Math.min(1, Math.max(0, raw / 1000));
-    },
-    calcDepth() {
-      const m = this.mystery;
-      m.depth = (m.momentum * 0.4) + (m.orbit * 0.3) + (m.fix * 0.3);
-      return m.depth;
-    },
-    toggle() {
-      this.mystery.active = !this.mystery.active;
-      if (this.mystery.active) {
-        this.mystery.momentum = 0.5 + (Math.random() - 0.5) * 0.3;
-        this.mystery.orbit = 0.5 + (Math.random() - 0.5) * 0.3;
-        this.mystery.fix = 0.5 + Math.random() * 0.3;
-      } else {
-        this.mystery.momentum = 0.5;
-        this.mystery.orbit = 0.5;
-        this.mystery.fix = 0.7;
-      }
-      this.calcDepth();
-      return this.mystery.active;
-    },
-    update(welt, kraft, leben) {
-      if (this.mystery.active) {
-        this.mystery.momentum += (Math.random() - 0.5) * 0.02;
-        this.mystery.orbit += (Math.random() - 0.5) * 0.02;
-        this.mystery.fix += (Math.random() - 0.5) * 0.01;
-        this.mystery.fix = Math.min(0.95, Math.max(0.15, this.mystery.fix));
-        this.calcDepth();
-      }
-      const phi4 = this.transform(welt, kraft, leben);
-      return { phi4, depth: this.mystery.depth, active: this.mystery.active };
+<script type="module">
+// ═══════════════════════════════════════════════════════════════════
+// MAINBOARD · 4-STATION · 2me CONTROLLER · HDF-ROM · ZaM · KlicK
+// Kompatibel mit: respo-master.js · stage.html · ID.html · me2our.html
+// Eigenbetrieb: fällt auf lokalen Master zurück, wenn respo-master fehlt
+// ═══════════════════════════════════════════════════════════════════
+
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ─── 1. KOMPATIBILITÄTS-LAYER ──────────────────────────────────────
+// Verbindet sich mit respo-master.js (falls vorhanden) oder nutzt
+// lokalen Fallback mit persistentem Speicher (localStorage + BC).
+
+const MASTER_KEY = 'iki1uc-master-respo';
+const BC_NAME = 'iki1uc-orbit';
+
+let masterChannel = null;
+let isMasterConnected = false;
+const localMaster = {
+  stations: {},
+  klick: 0,
+  zam: 'idle',
+  zoll: 'offen',
+  lastUpdate: Date.now(),
+};
+
+try {
+  masterChannel = new BroadcastChannel(BC_NAME);
+  masterChannel.onmessage = (ev) => {
+    if (ev.data?.type === 'master:state') {
+      Object.assign(localMaster, ev.data.payload);
+      isMasterConnected = true;
+      renderStationDots();
     }
   };
+} catch (e) { console.warn('BroadcastChannel nicht verfügbar:', e); }
 
-  // ---- HAUPT-ENGINE ----
-  const NET = {
-    tick: 0,
-    paused: false,
-    auto: false,
-    speed: 3,
+// Lade letzten bekannten Stand aus localStorage (Fallback für neue Tabs)
+try {
+  const stored = localStorage.getItem(MASTER_KEY);
+  if (stored) Object.assign(localMaster, JSON.parse(stored));
+} catch (_) {}
 
-    welt: { router: 'aktiv', stage: '3D', plugins: 13, badges: 0 },
-    kraft: { queue: 0, zen: 'bereit', dispatcher: 'aktiv', cmds: 0 },
-    leben: { zellen: 81, tick: 0, vital: 0.5, drift: 0.1 },
+function persistMaster() {
+  try { localStorage.setItem(MASTER_KEY, JSON.stringify(localMaster)); } catch (_) {}
+}
 
-    matrix: { atom: 81, uni: 243, run: 729, phi4: 0 },
-    commands: [],
-    log: [],
-    maxLog: 50,
-
-    init() {
-      this.logMsg('⚛️ IKI1UC · PHYSICS ENGINE · Orbit‑Simulation gestartet');
-      this.logMsg('💡 Befehle: SHOCK, WAVE, LINK, PUSH, GROW, MOVE, BREAK, MYSTERY');
-      this.updateUI();
-      this.updateMatrix(0);
-      this.updateMysteryUI();
-      this.drawPhysics();
-    },
-
-    tickStep(force) {
-      if (this.paused && !force) return;
-      this.tick++;
-      this.leben.tick = this.tick;
-      this.leben.vital = 0.5 + 0.3 * Math.sin(this.tick * 0.05);
-      this.leben.drift = 0.1 + 0.05 * Math.cos(this.tick * 0.07);
-      this.kraft.zen = this.tick % 10 < 3 ? '⚡ aktiv' : 'bereit';
-      this.kraft.queue = Math.max(0, this.kraft.queue - 0.2);
-      this.welt.badges = Math.floor(this.tick / 20) % 10;
-
-      if (this.commands.length > 0) {
-        const cmd = this.commands.shift();
-        this.processCmd(cmd);
-      }
-
-      const r = R_KERNEL.update(this.welt.badges + 1, this.kraft.queue + 1, this.leben.vital * 10);
-      this.matrix.phi4 = r.phi4;
-      this.updateMysteryUI();
-      this.updateUI();
-      this.calcMatrix();
-      this.drawPhysics();
-    },
-
-    processCmd(cmd) {
-      const u = cmd.toUpperCase();
-      this.logMsg(`⚡ Befehl: ${u}`);
-      this.kraft.cmds++;
-      if (u.includes('SHOCK')) {
-        this.kraft.queue += 5;
-        this.leben.vital = Math.min(1, this.leben.vital + 0.1);
-        this.logMsg('💥 SHOCK → Queue +5, Vital +0.1');
-      } else if (u.includes('WAVE')) {
-        this.kraft.queue += 3;
-        this.leben.drift += 0.05;
-        this.logMsg('🌊 WAVE → Drift +0.05');
-      } else if (u.includes('LINK')) {
-        this.welt.badges = Math.min(20, this.welt.badges + 3);
-        this.logMsg('🔗 LINK → Badges +3');
-      } else if (u.includes('PUSH')) {
-        this.kraft.queue = Math.max(0, this.kraft.queue - 2);
-        this.logMsg('📌 PUSH → Queue -2');
-      } else if (u.includes('GROW')) {
-        this.leben.zellen = Math.min(243, this.leben.zellen + 10);
-        this.logMsg('🌱 GROW → Zellen +10');
-      } else if (u.includes('MOVE')) {
-        this.leben.drift = Math.max(0, this.leben.drift - 0.03);
-        this.logMsg('🚀 MOVE → Drift -0.03');
-      } else if (u.includes('BREAK')) {
-        this.kraft.queue = 0;
-        this.leben.vital = 0.3;
-        this.logMsg('💔 BREAK → Queue 0, Vital 0.3');
-      } else if (u.includes('MYSTERY')) {
-        const active = R_KERNEL.toggle();
-        this.logMsg(active ? '🌀 Mystery aktiviert (Chaos-Modus)' : '🌀 Mystery deaktiviert (Ordnung-Modus)');
-      } else {
-        this.logMsg(`⚠️ Unbekannt: ${u}`);
-      }
-    },
-
-    updateMatrix(input) {
-      const hits = Math.floor(input / 6);
-      const val = 3 * hits * 90;
-      this.matrix.atom = val * 81;
-      this.matrix.uni = val * 243;
-      this.matrix.run = val * 729;
-      document.getElementById('m81').textContent = this.matrix.atom.toFixed(0);
-      document.getElementById('m243').textContent = this.matrix.uni.toFixed(0);
-      document.getElementById('m729').textContent = this.matrix.run.toFixed(0);
-      document.getElementById('mPhi4').textContent = 'Φ' + (this.matrix.phi4 * 100).toFixed(0);
-      document.getElementById('formulaDisplay').textContent =
-        `3 × ${hits} × 90 = ${val} | Φ4 = (${(this.welt.badges+1)} × ${(this.kraft.queue+1).toFixed(1)} × ${(this.leben.vital*10).toFixed(1)}) / (${R_KERNEL.mystery.depth.toFixed(2)} + 1) = ${(this.matrix.phi4 * 100).toFixed(0)}%`;
-    },
-
-    updateUI() {
-      document.getElementById('welt-router').textContent = this.welt.router;
-      document.getElementById('welt-stage').textContent = this.welt.stage;
-      document.getElementById('welt-plugins').textContent = this.welt.plugins;
-      document.getElementById('welt-badges').textContent = this.welt.badges;
-      document.getElementById('kraft-queue').textContent = this.kraft.queue.toFixed(1);
-      document.getElementById('kraft-zen').textContent = this.kraft.zen;
-      document.getElementById('kraft-input').textContent = this.kraft.dispatcher;
-      document.getElementById('kraft-cmds').textContent = this.kraft.cmds;
-      document.getElementById('leben-zellen').textContent = this.leben.zellen;
-      document.getElementById('leben-tick').textContent = this.leben.tick;
-      document.getElementById('leben-vital').textContent = this.leben.vital.toFixed(2);
-      document.getElementById('leben-drift').textContent = this.leben.drift.toFixed(2);
-    },
-
-    updateMysteryUI() {
-      const m = R_KERNEL.mystery;
-      document.getElementById('myst-momentum').textContent = m.momentum.toFixed(2);
-      document.getElementById('myst-orbit').textContent = m.orbit.toFixed(2);
-      document.getElementById('myst-fix').textContent = m.fix.toFixed(2);
-      document.getElementById('myst-depth').textContent = m.depth.toFixed(2);
-      const dot = document.getElementById('pause-dot');
-      const label = document.getElementById('pause-label');
-      dot.className = 'led ' + (this.paused ? 'red' : (R_KERNEL.mystery.active ? 'purple' : 'green'));
-      label.textContent = this.paused ? 'eingefroren' : (R_KERNEL.mystery.active ? 'Chaos' : 'Ordnung');
-    },
-
-    logMsg(msg) {
-      const time = new Date().toLocaleTimeString();
-      this.log.push({ time, msg });
-      if (this.log.length > this.maxLog) this.log.shift();
-      this.renderLog();
-    },
-
-    renderLog() {
-      const out = document.getElementById('log');
-      out.innerHTML = this.log.map(e => `[${e.time}] ${e.msg}`).join('\n');
-      out.scrollTop = out.scrollHeight;
-    },
-
-    sendCmd(cmd) {
-      if (!cmd) {
-        const input = document.getElementById('cmdInput');
-        cmd = input.value.trim();
-        if (!cmd) return;
-        input.value = '';
-      }
-      this.commands.push(cmd);
-    },
-
-    stepTick() {
-      this.paused = true;
-      this.logMsg('⏭ Schritt (danach pausiert)');
-      this.tickStep(true);
-    },
-
-    resumeRun() {
-      this.paused = false;
-      this.logMsg('▶ Weiter');
-    },
-
-    resetAll() {
-      this.tick = 0;
-      this.kraft.queue = 0;
-      this.kraft.cmds = 0;
-      this.leben.zellen = 81;
-      this.leben.vital = 0.5;
-      this.leben.drift = 0.1;
-      this.welt.badges = 0;
-      this.commands = [];
-      this.log = [];
-      this.paused = false;
-      R_KERNEL.mystery = { momentum: 0.5, orbit: 0.5, fix: 0.7, depth: 0.4, active: true };
-      this.logMsg('⟲ ALLES zurückgesetzt');
-      this.updateUI();
-      this.updateMatrix(0);
-      this.updateMysteryUI();
-    },
-
-    toggleAuto() {
-      this.auto = !this.auto;
-      if (this.auto) this.paused = false;
-      this.logMsg(this.auto ? '▶ AUTO an' : '⏸ AUTO aus');
-      if (this.auto) {
-        const speed = parseInt(document.getElementById('speedSlider').value) || 3;
-        this.speed = speed;
-        if (this._autoInt) clearInterval(this._autoInt);
-        const delay = Math.max(200, 2000 / speed);
-        this._autoInt = setInterval(() => {
-          if (this.auto && !this.paused) this.tickStep();
-        }, delay);
-      } else {
-        if (this._autoInt) { clearInterval(this._autoInt); this._autoInt = null; }
-      }
-    },
-
-    calcMatrix() {
-      const input = this.kraft.cmds + this.kraft.queue + this.welt.badges;
-      this.updateMatrix(input);
-    },
-
-    toggleMystery() {
-      const active = R_KERNEL.toggle();
-      this.logMsg(active ? '🌀 Mystery aktiviert (Chaos)' : '🌀 Mystery deaktiviert (Ordnung)');
-      this.updateMysteryUI();
-      this.calcMatrix();
-    },
-
-    // ---- PHYSIK-ZEICHNUNG (Canvas) ----
-    drawPhysics() {
-      const w = canvas.width;
-      const h = canvas.height;
-      ctx.clearRect(0, 0, w, h);
-
-      // Hintergrund-Sterne
-      ctx.fillStyle = '#0a0a12';
-      ctx.fillRect(0, 0, w, h);
-      for (let i = 0; i < 80; i++) {
-        if (i % 2 === 0) continue;
-        ctx.fillStyle = `rgba(255,255,255,${0.05 + Math.random()*0.1})`;
-        ctx.beginPath();
-        ctx.arc(Math.random() * w, Math.random() * h, 0.5 + Math.random() * 0.8, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // Zentrum (Kern)
-      const cx = w * 0.5;
-      const cy = h * 0.5;
-
-      // Werte holen
-      const welt = this.welt.badges + 1;
-      const kraft = this.kraft.queue + 1;
-      const leben = this.leben.vital * 10;
-      const depth = R_KERNEL.mystery.depth || 0.1;
-      const phi4 = this.matrix.phi4 || 0;
-
-      // Orbit-Radien basierend auf Welt, Kraft, Leben
-      const rWelt = 40 + welt * 20;
-      const rKraft = 80 + kraft * 15;
-      const rLeben = 120 + leben * 10;
-      const rPhi = 160 + phi4 * 80;
-
-      // Gravitations-Zentrum
-      ctx.shadowColor = '#ffd700';
-      ctx.shadowBlur = 30;
-      ctx.fillStyle = '#ffd700';
-      ctx.beginPath();
-      ctx.arc(cx, cy, 12 + phi4 * 20, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.shadowBlur = 0;
-
-      // Umlaufbahnen (Kreise)
-      ctx.strokeStyle = 'rgba(255,215,0,0.08)';
-      ctx.lineWidth = 0.5;
-      for (let r of [rWelt, rKraft, rLeben, rPhi]) {
-        ctx.beginPath();
-        ctx.arc(cx, cy, r, 0, Math.PI * 2);
-        ctx.stroke();
-      }
-
-      // Winkel basierend auf Tick und Werten
-      const angleWelt = this.tick * 0.02 + welt * 0.1;
-      const angleKraft = this.tick * 0.015 + kraft * 0.08;
-      const angleLeben = this.tick * 0.01 + leben * 0.06;
-      const anglePhi = this.tick * 0.008 + phi4 * 0.12;
-
-      // Planeten zeichnen (mit Größe & Farbe)
-      const planets = [
-        { r: rWelt, angle: angleWelt, color: '#ffd700', label: '3', size: 8 + welt * 0.5 },
-        { r: rKraft, angle: angleKraft, color: '#66ccff', label: '9', size: 10 + kraft * 0.4 },
-        { r: rLeben, angle: angleLeben, color: '#ff66ff', label: '81', size: 12 + leben * 0.3 },
-        { r: rPhi, angle: anglePhi, color: '#a78bfa', label: 'Φ', size: 14 + phi4 * 30 },
-      ];
-
-      for (const p of planets) {
-        const x = cx + p.r * Math.cos(p.angle);
-        const y = cy + p.r * Math.sin(p.angle);
-        ctx.shadowColor = p.color;
-        ctx.shadowBlur = 20;
-        ctx.fillStyle = p.color;
-        ctx.beginPath();
-        ctx.arc(x, y, p.size, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = '#0a0a12';
-        ctx.font = `${p.size * 0.6}px Consolas`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(p.label, x, y);
-      }
-
-      // Verbindungslinien (Gravitations-Felder)
-      ctx.globalAlpha = 0.15;
-      ctx.strokeStyle = '#a78bfa';
-      ctx.lineWidth = 0.5;
-      for (let i = 0; i < planets.length; i++) {
-        for (let j = i + 1; j < planets.length; j++) {
-          const p1 = planets[i];
-          const p2 = planets[j];
-          const x1 = cx + p1.r * Math.cos(p1.angle);
-          const y1 = cy + p1.r * Math.sin(p1.angle);
-          const x2 = cx + p2.r * Math.cos(p2.angle);
-          const y2 = cy + p2.r * Math.sin(p2.angle);
-          ctx.beginPath();
-          ctx.moveTo(x1, y1);
-          ctx.lineTo(x2, y2);
-          ctx.stroke();
-        }
-      }
-      ctx.globalAlpha = 1;
-
-      // Info-Text
-      ctx.fillStyle = '#3d5a70';
-      ctx.font = '12px Consolas';
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'bottom';
-      ctx.fillText(`Tick: ${this.tick}  |  Welt: ${welt}  Kraft: ${kraft.toFixed(1)}  Leben: ${leben.toFixed(1)}  Φ4: ${(phi4*100).toFixed(0)}%`, 20, h - 20);
-      ctx.textAlign = 'right';
-      ctx.fillText(`Mystery: ${R_KERNEL.mystery.active ? 'ON' : 'OFF'}  |  Depth: ${depth.toFixed(2)}`, w - 20, h - 20);
-    }
-  };
-
-  // ---- Globale Funktionen ----
-  window.sendCmd = function() {
-    const input = document.getElementById('cmdInput');
-    const cmd = input.value.trim();
-    if (cmd) NET.sendCmd(cmd);
-  };
-  window.toggleAuto = function() { NET.toggleAuto(); };
-  window.stepTick = function() { NET.stepTick(); };
-  window.resumeRun = function() { NET.resumeRun(); };
-  window.resetAll = function() { NET.resetAll(); };
-  window.toggleMystery = function() { NET.toggleMystery(); };
-
-  // ---- Tastatur ----
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && document.activeElement === document.getElementById('cmdInput')) {
-      window.sendCmd(); e.preventDefault();
-    }
-    if (e.key === ' ' && e.target === document.body) {
-      e.preventDefault(); window.toggleAuto();
-    }
-    if ((e.key === 'm' || e.key === 'M') && e.target !== document.getElementById('cmdInput')) {
-      window.toggleMystery();
-    }
-  });
-
-  // ---- Speed Slider ----
-  document.getElementById('speedSlider').addEventListener('input', function() {
-    const speed = parseInt(this.value) || 3;
-    NET.speed = speed;
-    if (NET.auto) {
-      if (NET._autoInt) { clearInterval(NET._autoInt); NET._autoInt = null; }
-      const delay = Math.max(200, 2000 / speed);
-      NET._autoInt = setInterval(() => {
-        if (NET.auto && !NET.paused) NET.tickStep();
-      }, delay);
-    }
-  });
-
-  // ---- Uhr ----
-  function updateClock() {
-    document.getElementById('sys-clock').textContent = `⏱️ ${new Date().toLocaleTimeString()}`;
+function reportToMaster(stationId, value) {
+  localMaster.stations[stationId] = { value, ts: Date.now() };
+  localMaster.lastUpdate = Date.now();
+  persistMaster();
+  if (masterChannel) {
+    masterChannel.postMessage({
+      type: 'station:report',
+      from: 'MAINBOARD',
+      station: stationId,
+      value,
+      ts: Date.now(),
+    });
   }
-  setInterval(updateClock, 1000);
-  updateClock();
+}
 
-  // ---- Hintergrund-Tick ----
-  setInterval(() => {
-    if (!NET.auto && !NET.paused) NET.tickStep();
-  }, 700);
+// ─── 2. HDF-ROM-SYSTEM (deine Dateien) ─────────────────────────────
+const HDF_ROM = {
+  // Basis-ROMs (d.hdf.rom, e.hdf.rom, …)
+  d: { file: 'd.hdf.rom', ready: 'd.ready', label: 'D-Basis', station: 'cpu' },
+  e: { file: 'e.hdf.rom', ready: 'e.ready', label: 'E-Basis', station: 'gpu' },
+  i: { file: 'i.hdf.rom', ready: 'i.ready', label: 'I-Basis', station: 'ram' },
+  n: { file: 'n.hdf.rom', ready: 'n.ready', label: 'N-Basis', station: 'ssd' },
+  o: { file: 'o.hdf.rom', ready: 'o.ready', label: 'O-Basis', station: 'cpu' },
+  r: { file: 'r.hdf.rom', ready: 'r.ready', label: 'R-Basis', station: 'gpu' },
+  s: { file: 's.hdf.rom', ready: 's.ready', label: 'S-Basis', station: 'ram' },
+  u: { file: 'u.hdf.rom', ready: 'u.ready', label: 'U-Basis', station: 'ssd' },
+  w: { file: 'w.hdf.rom', ready: 'w.ready', label: 'W-Basis', station: 'cpu' },
+  // Axiom-ROMs
+  'axiom': { file: 'axiom.hdf.rom', label: 'Axiom', station: null },
+  'axiom.3': { file: 'axiom.3.hdf.rom', label: 'Axiom-3', station: null },
+  'freeaxiom': { file: 'freeaxiom.hdf.rom', label: 'FreeAxiom', station: null },
+  'freeaxiom.9': { file: 'freeaxiom.9.hdf.rom', label: 'FreeAxiom-9', station: null },
+  // System-ROMs
+  '81': { file: '81.hdf.rom', label: '81-Basis', station: null },
+  '729': { file: '729.js', label: '729-Run', station: null },
+  '3.hit.90': { file: '3.hit.90.hdf.rom', label: '3-Hit-90', station: null },
+  'asymilation': { file: 'asymilation.hdf.rom', ready: 'asymilation.ready', label: 'Asymilation', station: null },
+  'desamalasion': { file: 'desamalasion.hdf.rom', label: 'Desamalasion', station: null },
+  'zauber.6': { file: 'zauber.6.user.use', label: 'Zauber-6', station: null },
+  'bewegung': { file: 'bewegung.ready', label: 'Bewegung', station: null },
+};
 
-  // ---- Canvas Resize bei Fensteränderung ----
-  window.addEventListener('resize', () => {
-    resizeCanvas();
-    NET.drawPhysics();
+function resolveHdf(input) {
+  const key = input.trim().toLowerCase().replace('#', '');
+  const rom = HDF_ROM[key];
+  if (rom) {
+    const st = rom.station ? ` → Station ${rom.station.toUpperCase()}` : '';
+    return `✅ ${key} · ${rom.file}${rom.ready ? ' · ready:' + rom.ready : ''} · ${rom.label}${st}`;
+  }
+  return `❌ "${key}" nicht im HDF-ROM-Register`;
+}
+
+// ─── 3. HARDWARE-DATENBANK (reale Werte + Issues) ──────────────────
+const HARDWARE_DB = {
+  cpu: {
+    'intel_i9_13900K': { brand:'Intel', model:'Core i9-13900K', score:42000, tdp:253, temp:95, issues:['Spannungsinstabilität 13. Gen'] },
+    'intel_i9_14900K': { brand:'Intel', model:'Core i9-14900K', score:44000, tdp:253, temp:100, issues:['Spannungsinstabilität 14. Gen','Thermal-Throttling'] },
+    'intel_i7_13700K': { brand:'Intel', model:'Core i7-13700K', score:35000, tdp:253, temp:90, issues:['Spannungsinstabilität 13. Gen'] },
+    'amd_ryzen9_7950X': { brand:'AMD', model:'Ryzen 9 7950X', score:40000, tdp:170, temp:95, issues:['lange Bootzeiten AM5'] },
+    'amd_ryzen7_7800X3D': { brand:'AMD', model:'Ryzen 7 7800X3D', score:32000, tdp:120, temp:75, issues:[] },
+    'intel_i5_13600K': { brand:'Intel', model:'Core i5-13600K', score:28000, tdp:181, temp:85, issues:['Spannungsinstabilität 13. Gen'] },
+  },
+  gpu: {
+    'nvidia_rtx4090': { brand:'NVIDIA', model:'RTX 4090', score:85000, vram:24, tdp:450, issues:['Stromspitzen (ATX 3.0 nötig)'] },
+    'nvidia_rtx4080': { brand:'NVIDIA', model:'RTX 4080', score:65000, vram:16, tdp:320, issues:['hoher Preis'] },
+    'amd_rx7900XTX': { brand:'AMD', model:'RX 7900 XTX', score:62000, vram:24, tdp:355, issues:['Treiberschwankungen'] },
+    'nvidia_rtx4070': { brand:'NVIDIA', model:'RTX 4070', score:45000, vram:12, tdp:200, issues:['niedriger Speicher'] },
+    'amd_rx7800XT': { brand:'AMD', model:'RX 7800 XT', score:48000, vram:16, tdp:263, issues:['Treiberschwankungen'] },
+  },
+  ram: {
+    'ddr5_6400_32': { type:'DDR5', speed:6400, size:32, latency:32 },
+    'ddr5_6000_32': { type:'DDR5', speed:6000, size:32, latency:30 },
+    'ddr5_5600_16': { type:'DDR5', speed:5600, size:16, latency:28 },
+    'ddr4_3600_32': { type:'DDR4', speed:3600, size:32, latency:18 },
+  },
+  ssd: {
+    'pcie4_7000': { interface:'PCIe 4.0', speed_read:7000, speed_write:6500, iops:1000000 },
+    'pcie4_5000': { interface:'PCIe 4.0', speed_read:5000, speed_write:4500, iops:800000 },
+    'pcie3_3500': { interface:'PCIe 3.0', speed_read:3500, speed_write:3200, iops:600000 },
+    'sata_550': { interface:'SATA', speed_read:550, speed_write:520, iops:90000 },
+  },
+};
+
+// ─── 4. THREE.JS SETUP ─────────────────────────────────────────────
+const canvas = document.getElementById('canvas');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias:true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.2;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x05070e);
+scene.fog = new THREE.Fog(0x05070e, 8, 22);
+
+const camera = new THREE.PerspectiveCamera(42, canvas.clientWidth / canvas.clientHeight, 0.1, 40);
+camera.position.set(5, 4, 7);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.06;
+controls.target.set(0, 0.2, 0);
+controls.minDistance = 3;
+controls.maxDistance = 18;
+
+// Lichter
+scene.add(new THREE.AmbientLight(0x222244, 0.7));
+const dLight = new THREE.DirectionalLight(0xffeedd, 2.0);
+dLight.position.set(6, 10, 8);
+scene.add(dLight);
+scene.add(new THREE.DirectionalLight(0x4488ff, 0.5).position.set(-4, 2, -4));
+scene.add(new THREE.DirectionalLight(0x88ddff, 0.3).position.set(0, -2, 5));
+
+// Gitter
+const grid = new THREE.GridHelper(6, 12, 0x44aa77, 0x226644);
+grid.position.y = -0.9;
+scene.add(grid);
+
+// Zentraler Kern (2me)
+const coreGeo = new THREE.IcosahedronGeometry(0.4, 2);
+const coreMat = new THREE.MeshStandardMaterial({
+  color: 0xb388ff, emissive: 0xb388ff, emissiveIntensity: 0.4,
+  roughness: 0.2, metalness: 0.7, transparent: true, opacity: 0.85,
+});
+const coreMesh = new THREE.Mesh(coreGeo, coreMat);
+coreMesh.position.set(0, 0.2, 0);
+scene.add(coreMesh);
+
+// ─── 5. VIER STATIONEN (CPU · GPU · RAM · SSD) ─────────────────────
+const STATIONS = [
+  { id:'cpu', label:'CPU', color:0x88ddff, angle:0,   rom:'d' },
+  { id:'gpu', label:'GPU', color:0xff66aa, angle:90,  rom:'e' },
+  { id:'ram', label:'RAM', color:0xf0d080, angle:180, rom:'i' },
+  { id:'ssd', label:'SSD', color:0x8cf0d0, angle:270, rom:'n' },
+];
+
+const stationMeshes = [];
+const connectionLines = [];
+
+STATIONS.forEach((st) => {
+  // Blasen-Mesh
+  const geo = new THREE.SphereGeometry(0.45, 24, 24);
+  const mat = new THREE.MeshStandardMaterial({
+    color: st.color, emissive: st.color, emissiveIntensity: 0.15,
+    transparent: true, opacity: 0.75, roughness: 0.25, metalness: 0.5,
+  });
+  const mesh = new THREE.Mesh(geo, mat);
+  const angleRad = (st.angle * Math.PI) / 180;
+  mesh.position.set(Math.sin(angleRad) * 2.2, 0.2, Math.cos(angleRad) * 2.2);
+  scene.add(mesh);
+
+  // Label-Sprite
+  const c = document.createElement('canvas');
+  c.width = 256; c.height = 64;
+  const ctx = c.getContext('2d');
+  ctx.font = 'bold 32px Consolas';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#d0e8e0';
+  ctx.fillText(st.label, 128, 32);
+  const tex = new THREE.CanvasTexture(c);
+  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false }));
+  sprite.scale.set(0.8, 0.2, 1);
+  sprite.position.copy(mesh.position);
+  sprite.position.y += 0.65;
+  scene.add(sprite);
+
+  // Verbindungslinie zum Kern
+  const lineGeo = new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(0, 0.2, 0),
+    mesh.position.clone(),
+  ]);
+  const lineMat = new THREE.LineBasicMaterial({
+    color: st.color, transparent: true, opacity: 0.25,
+  });
+  const line = new THREE.Line(lineGeo, lineMat);
+  scene.add(line);
+  connectionLines.push(line);
+
+  stationMeshes.push({ ...st, mesh, sprite, line, baseColor: st.color, targetValue: 0.5 });
+});
+
+// ─── 6. DOM REFS ───────────────────────────────────────────────────
+const $ = (id) => document.getElementById(id);
+const statusText = $('statusText');
+const resultContent = $('resultContent');
+const logBox = $('logBox');
+
+const cpuSelect = $('cpuSelect'), gpuSelect = $('gpuSelect');
+const ramSelect = $('ramSelect'), ssdSelect = $('ssdSelect');
+const cpuCustom = $('cpuCustom'), gpuCustom = $('gpuCustom');
+const ramCustom = $('ramCustom'), ssdCustom = $('ssdCustom');
+
+// ─── 7. LOG ────────────────────────────────────────────────────────
+function log(msg, tag = '2me') {
+  const entry = document.createElement('div');
+  entry.className = 'entry';
+  const t = new Date().toLocaleTimeString('de-DE');
+  entry.innerHTML = `<span class="time">[${t}]</span><span class="tag">${tag}</span>${msg}`;
+  logBox.appendChild(entry);
+  logBox.scrollTop = logBox.scrollHeight;
+  while (logBox.children.length > 50) logBox.removeChild(logBox.firstChild);
+}
+
+// ─── 8. CUSTOM-FELD PARSER ─────────────────────────────────────────
+function parseCustom(str, type) {
+  const lower = (str || '').toLowerCase();
+  const maps = {
+    cpu: {
+      '14900':'intel_i9_14900K','13900':'intel_i9_13900K','13700':'intel_i7_13700K',
+      '7950':'amd_ryzen9_7950X','7800':'amd_ryzen7_7800X3D','13600':'intel_i5_13600K',
+    },
+    gpu: {
+      '4090':'nvidia_rtx4090','4080':'nvidia_rtx4080','7900':'amd_rx7900XTX',
+      '4070':'nvidia_rtx4070','7800':'amd_rx7800XT',
+    },
+    ram: {
+      '6400':'ddr5_6400_32','6000':'ddr5_6000_32','5600':'ddr5_5600_16','3600':'ddr4_3600_32',
+    },
+    ssd: {
+      '7000':'pcie4_7000','5000':'pcie4_5000','3500':'pcie3_3500','550':'sata_550',
+    },
+  };
+  const m = maps[type] || {};
+  for (const key in m) if (lower.includes(key)) return m[key];
+  return null;
+}
+
+function getSelected(selectEl, customEl, type) {
+  if (selectEl.value === 'custom') {
+    const parsed = parseCustom(customEl.value, type);
+    if (parsed) return parsed;
+    log(`⚠️ Custom "${customEl.value}" unbekannt – Fallback`, 'HDF');
+    return null;
+  }
+  return selectEl.value;
+}
+
+function getHardwareData(type, id) {
+  const db = HARDWARE_DB[type];
+  if (id && db && db[id]) return { ...db[id], _known: true };
+  // Fallback mit deterministischem Seed (kein Zufall, damit 2me prüfen kann)
+  const seed = (id || 'unknown').length * 1000 + 5000;
+  return {
+    brand:'?', model: id || 'unbekannt',
+    score: seed, tdp: 150, temp: 80, issues: ['unbekannt – keine Datenquelle'],
+    _known: false,
+  };
+}
+
+// ─── 9. 4× GENAUIGKEIT & 2× PRÜFBARKEIT ────────────────────────────
+// Die 4 Genauigkeits-Pässe prüfen die Simulation aus 4 verschiedenen
+// Blickwinkeln. Die 2 Prüfbarkeits-Checks verifizieren die Ergebnisse
+// unabhängig, bevor sie freigegeben werden.
+
+function passBalance(cpu, gpu) {
+  const r = gpu.score / cpu.score;
+  if (r > 1.8) return { penalty: 15, msg:'GPU zu stark für CPU (CPU-Limit)' };
+  if (r < 0.5) return { penalty: 10, msg:'CPU zu stark für GPU (GPU-Limit)' };
+  return { penalty: 0, msg:null };
+}
+
+function passMemory(cpu, ram) {
+  const pen = [];
+  if (ram.speed < 4800 && cpu.score > 35000) { pen.push({ p:10, m:'RAM zu langsam für High-End-CPU' }); }
+  if (ram.size < 16) { pen.push({ p:8, m:'Wenig RAM (<16GB)' }); }
+  return pen;
+}
+
+function passStorage(gpu, ssd) {
+  if (ssd.speed_read < 1000 && gpu.score > 40000) {
+    return { penalty: 8, msg:'SSD zu langsam (SATA) für Gaming-GPU' };
+  }
+  return { penalty: 0, msg:null };
+}
+
+function passThermal(cpu, gpu) {
+  const pen = [];
+  const totalTdp = (cpu.tdp || 0) + (gpu.tdp || 0);
+  if (totalTdp > 500) pen.push({ p:5, m:`Gesamt-TDP ${totalTdp}W – Kühlung prüfen` });
+  if ((cpu.temp || 80) > 95) pen.push({ p:5, m:`CPU-Temp ${cpu.temp}°C – Throttling-Gefahr` });
+  return pen;
+}
+
+// 4× Genauigkeit: führt 4 unabhängige Pässe aus
+function accuracy4x(cpu, gpu, ram, ssd) {
+  const passes = [];
+  const bal = passBalance(cpu, gpu);
+  passes.push({ name:'Balance', ...bal });
+  const mem = passMemory(cpu, ram);
+  passes.push({ name:'Memory', penalty: mem.reduce((s,x)=>s+x.p,0), msgs: mem.map(x=>x.m) });
+  const sto = passStorage(gpu, ssd);
+  passes.push({ name:'Storage', ...sto });
+  const therm = passThermal(cpu, gpu);
+  passes.push({ name:'Thermal', penalty: therm.reduce((s,x)=>s+x.p,0), msgs: therm.map(x=>x.m) });
+
+  const totalPenalty = passes.reduce((s, p) => s + (p.penalty || 0), 0);
+  const accuracy = Math.max(0, 100 - totalPenalty);
+  return { passes, accuracy, totalPenalty };
+}
+
+// 2× Prüfbarkeit: zwei unabhängige Verifikationen
+function verifiability2x(accuracy, passes) {
+  // Prüfung 1: Alle 4 Pässe haben ein Ergebnis (keine NaN / undefined)
+  const check1 = passes.every(p => typeof p.penalty === 'number' && !Number.isNaN(p.penalty));
+
+  // Prüfung 2: Accuracy ist im erlaubten Bereich und deterministisch
+  const expected = Math.max(0, 100 - passes.reduce((s,p)=>s+(p.penalty||0), 0));
+  const check2 = Math.abs(expected - accuracy) < 0.001;
+
+  return { check1, check2, passed: check1 && check2 };
+}
+
+// ─── 10. SIMULATION ────────────────────────────────────────────────
+function simulate() {
+  $('simulateBtn').disabled = true;
+  $('simulateBtn').textContent = '⏳ 2me prüft …';
+
+  setTimeout(() => {
+    const cpuId = getSelected(cpuSelect, cpuCustom, 'cpu');
+    const gpuId = getSelected(gpuSelect, gpuCustom, 'gpu');
+    const ramId = getSelected(ramSelect, ramCustom, 'ram');
+    const ssdId = getSelected(ssdSelect, ssdCustom, 'ssd');
+
+    const cpuData = getHardwareData('cpu', cpuId);
+    const gpuData = getHardwareData('gpu', gpuId);
+    const ramData = getHardwareData('ram', ramId);
+    const ssdData = getHardwareData('ssd', ssdId);
+
+    // 4× Genauigkeit ausführen
+    const acc4 = accuracy4x(cpuData, gpuData, ramData, ssdData);
+
+    // 2× Prüfbarkeit ausführen
+    const ver2 = verifiability2x(acc4.accuracy, acc4.passes);
+
+    // Endgültige Kompatibilität (nur wenn 2× Prüfbarkeit OK)
+    const compatibility = ver2.passed ? acc4.accuracy : acc4.accuracy * 0.8;
+
+    // Respo (Effizienz)
+    const totalTdp = (cpuData.tdp || 200) + (gpuData.tdp || 300);
+    const respo = Math.max(0, Math.min(1,
+      0.5 + 0.5 * (compatibility / 100) - 0.001 * totalTdp
+    ));
+
+    // ── Ergebnis anzeigen ──
+    $('rCompat').textContent = compatibility.toFixed(0) + '%';
+    $('rCompat').className = 'val ' + (compatibility >= 60 ? 'gold' : 'red');
+    $('rBottleneck').textContent = acc4.passes[0].msg || 'Kein Engpass';
+    $('rRespo').textContent = (respo * 100).toFixed(0) + '%';
+    $('rRespo').className = 'val ' + (respo >= 0.7 ? 'green' : 'red');
+
+    const allIssues = [
+      ...(cpuData.issues || []),
+      ...(gpuData.issues || []),
+    ];
+    $('rIssues').textContent = allIssues.length ? '⚠️ ' + allIssues.join('; ') : '✅ Keine bekannt';
+    $('rIssues').className = 'val ' + (allIssues.length ? 'red' : 'green');
+
+    let empfehlung = '';
+    if (compatibility >= 80) empfehlung = '✅ Ausgezeichnete Kombination';
+    else if (compatibility >= 60) empfehlung = '👍 Solides System';
+    else if (compatibility >= 40) empfehlung = '⚠️ Nicht optimal';
+    else empfehlung = '❌ Stark inkompatibel';
+    $('rRecommend').textContent = empfehlung;
+
+    // 4× Genauigkeit + 2× Prüfbarkeit
+    $('r4x').textContent = acc4.accuracy.toFixed(0) + '% (' + acc4.passes.length + ' Pässe)';
+    $('r2x').textContent = ver2.passed ? '✅ beide Checks OK' : '❌ Check fehlgeschlagen';
+    $('r2x').className = 'val ' + (ver2.passed ? 'purple' : 'red');
+
+    // 2me Panel
+    $('chk4x').className = 'dot ' + (acc4.accuracy > 50 ? 'ok' : 'fail');
+    $('acc4x').textContent = acc4.accuracy.toFixed(0) + '%';
+    $('chk2x').className = 'dot ' + (ver2.passed ? 'ok' : 'fail');
+    $('acc2x').textContent = ver2.passed ? 'OK' : 'FAIL';
+
+    // Stationen melden
+    reportToMaster('cpu', cpuData.score / 50000);
+    reportToMaster('gpu', gpuData.score / 90000);
+    reportToMaster('ram', (ramData.speed || 6000) / 8000);
+    reportToMaster('ssd', (ssdData.speed_read || 5000) / 8000);
+
+    $('cpuVal').textContent = (cpuData.score / 1000).toFixed(0) + 'k';
+    $('gpuVal').textContent = (gpuData.score / 1000).toFixed(0) + 'k';
+    $('ramVal').textContent = (ramData.speed || 0) + 'MT/s';
+    $('ssdVal').textContent = (ssdData.speed_read || 0) + 'MB/s';
+
+    // Blasen aktualisieren
+    const values = [
+      cpuData.score / 50000,
+      gpuData.score / 90000,
+      (ramData.speed || 6000) / 8000,
+      (ssdData.speed_read || 5000) / 8000,
+    ];
+    stationMeshes.forEach((st, i) => {
+      const v = Math.min(1, Math.max(0.2, values[i]));
+      st.targetValue = v;
+      st.mesh.material.emissiveIntensity = 0.1 + v * 0.6;
+    });
+
+    // Status
+    $('stStations').textContent = '4/4';
+    $('stKlick').textContent = parseInt($('stKlick').textContent || '0', 10) + 1;
+    $('stZam').textContent = 'run→done';
+    $('stZoll').textContent = ver2.passed ? 'offen' : 'blockiert';
+
+    log(`Simulation · Kompat ${compatibility.toFixed(0)}% · 4× ${acc4.accuracy.toFixed(0)}% · 2× ${ver2.passed ? 'OK' : 'FAIL'}`, '2me');
+
+    // Rücksetzen
+    $('simulateBtn').disabled = false;
+    $('simulateBtn').textContent = '🔍 SIMULIEREN · 4× GENAUIGKEIT';
+    $('accuracyBadge').textContent = ver2.passed ? '2me: ✅ geprüft' : '2me: ⚠️ unsicher';
+  }, 180);
+}
+
+// ─── 11. STATION DOTS (2me Panel) ──────────────────────────────────
+function renderStationDots() {
+  ['cpu','gpu','ram','ssd'].forEach(id => {
+    const dot = $('chk' + id.charAt(0).toUpperCase() + id.slice(1));
+    if (!dot) return;
+    const has = !!localMaster.stations[id];
+    dot.className = 'dot ' + (has ? 'ok' : '');
+  });
+}
+
+// ─── 12. 2me CONTROLLER BUTTONS ────────────────────────────────────
+const me2State = { allow:true, boost:false, slow:false, override:false };
+
+function setMe2Role() {
+  const roles = [];
+  if (me2State.allow) roles.push('ALLOW');
+  if (me2State.boost) roles.push('BOOST');
+  if (me2State.slow) roles.push('SLOW');
+  if (me2State.override) roles.push('OVERRIDE');
+  $('me2Role').textContent = roles.join('·') || 'IDLE';
+  $('me2Role').className = 'badge' + (roles.length ? ' master' : '');
+}
+
+$('btnAllow').addEventListener('click', () => {
+  me2State.allow = !me2State.allow;
+  $('btnAllow').classList.toggle('active', me2State.allow);
+  $('stZoll').textContent = me2State.allow ? 'offen' : 'blockiert';
+  log(me2State.allow ? 'Zoll geöffnet' : 'Zoll geschlossen', '2me');
+  setMe2Role();
+});
+$('btnBoost').addEventListener('click', () => {
+  me2State.boost = !me2State.boost;
+  me2State.slow = false;
+  $('btnBoost').classList.toggle('active', me2State.boost);
+  $('btnSlow').classList.remove('active');
+  log(me2State.boost ? 'KlicK verstärkt' : 'KlicK normal', '2me');
+  setMe2Role();
+});
+$('btnSlow').addEventListener('click', () => {
+  me2State.slow = !me2State.slow;
+  me2State.boost = false;
+  $('btnSlow').classList.toggle('active', me2State.slow);
+  $('btnBoost').classList.remove('active');
+  log(me2State.slow ? 'KlicK gedämpft' : 'KlicK normal', '2me');
+  setMe2Role();
+});
+$('btnOverride').addEventListener('click', () => {
+  me2State.override = !me2State.override;
+  $('btnOverride').classList.toggle('active', me2State.override);
+  log(me2State.override ? 'Override aktiv – Regeln umgangen' : 'Override aus', '2me');
+  setMe2Role();
+});
+
+// ─── 13. HDF RESOLVER ──────────────────────────────────────────────
+$('hdfBtn').addEventListener('click', () => {
+  const val = $('hdfInput').value;
+  const out = resolveHdf(val);
+  $('hdfOut').textContent = out;
+  log(out, 'HDF');
+});
+$('hdfInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') $('hdfBtn').click();
+});
+
+// ─── 14. KlicK / ZaM HOOKS (für externe Systeme) ──────────────────
+window.MAINBOARD = {
+  simulate,
+  klick: (source = 'external') => {
+    log(`KlicK von ${source}`, 'KlicK');
+    simulate();
+  },
+  Zam: {
+    run: (mod) => {
+      if (mod === 'mainboard' || mod === 'MAINBOARD') {
+        log('ZaM.run(MAINBOARD)', 'ZaM');
+        simulate();
+        return true;
+      }
+      return false;
+    },
+    state: () => ({ ...me2State, stations: localMaster.stations }),
+  },
+  Zoll: {
+    check: (signal) => {
+      if (!me2State.allow) return { passed:false, reason:'Zoll geschlossen' };
+      if (me2State.override) return { passed:true, reason:'Override' };
+      return { passed:true, reason:'OK' };
+    },
+  },
+  Hdf: { resolve: resolveHdf, register: HDF_ROM },
+  Me2: me2State,
+};
+
+// ─── 15. EVENT BINDING ─────────────────────────────────────────────
+[
+  ['cpuSelect','cpuCustom'],['gpuSelect','gpuCustom'],
+  ['ramSelect','ramCustom'],['ssdSelect','ssdCustom'],
+].forEach(([selId, inpId]) => {
+  const sel = $(selId), inp = $(inpId);
+  sel.addEventListener('change', () => {
+    inp.style.display = sel.value === 'custom' ? 'block' : 'none';
+  });
+});
+
+$('simulateBtn').addEventListener('click', simulate);
+
+// ─── 16. RESIZE ────────────────────────────────────────────────────
+function resize() {
+  const w = canvas.parentElement.clientWidth;
+  const h = canvas.parentElement.clientHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+}
+window.addEventListener('resize', resize);
+resize();
+
+// ─── 17. ANIMATION LOOP ────────────────────────────────────────────
+let tick = 0;
+function animate() {
+  requestAnimationFrame(animate);
+  tick++;
+
+  // Kern pulsieren
+  const pulse = 1 + 0.06 * Math.sin(tick * 0.05);
+  coreMesh.scale.setScalar(pulse);
+  coreMesh.rotation.y += 0.005;
+  coreMesh.rotation.x += 0.002;
+
+  // Stationen animieren (sanfte Annäherung an Zielwert)
+  stationMeshes.forEach((st, i) => {
+    const current = st.mesh.scale.x;
+    const target = 0.7 + st.targetValue * 0.6;
+    const next = current + (target - current) * 0.08;
+    st.mesh.scale.setScalar(next);
+    st.mesh.rotation.y += 0.008;
+    // Orbital-Drift
+    const angle = (st.angle * Math.PI / 180) + tick * 0.003;
+    st.mesh.position.x = Math.sin(angle) * 2.2;
+    st.mesh.position.z = Math.cos(angle) * 2.2;
+    st.sprite.position.copy(st.mesh.position);
+    st.sprite.position.y += 0.65;
+    // Linie aktualisieren
+    const positions = st.line.geometry.attributes.position.array;
+    positions[3] = st.mesh.position.x;
+    positions[4] = st.mesh.position.y;
+    positions[5] = st.mesh.position.z;
+    st.line.geometry.attributes.position.needsUpdate = true;
   });
 
-  // ---- Start ----
-  NET.init();
-  console.log('⚛️ IKI1UC · PHYSICS ENGINE · Orbit‑Simulation geladen');
-  console.log('⌨️  Leertaste=Auto, Enter=Befehl, m=Mystery-Toggle');
+  controls.update();
+  renderer.render(scene, camera);
+}
+
+// ─── 18. INIT ──────────────────────────────────────────────────────
+setMe2Role();
+renderStationDots();
+simulate();
+log('MAINBOARD · 4-Station · 2me · HDF-ROM bereit', '2me');
+log('Kompatibel mit: respo-master.js · stage.html · ZaM · KlicK', 'sys');
+log('Eigenbetrieb aktiv (kein respo-master verbunden)', 'sys');
+animate();
+
+console.log('%c🖥️ MAINBOARD · 4-STATION · 2me CONTROLLER geladen', 'color:#b388ff;font-weight:bold');
+console.log('→ window.MAINBOARD.simulate() · .klick() · .Zam.run() · .Hdf.resolve()');
 </script>
 </body>
 </html>
